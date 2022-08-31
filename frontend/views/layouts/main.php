@@ -59,7 +59,11 @@ $asset = AppAsset::register($this);
 
     } else {
         $menuItems[] = ['label' => 'Main Menu', 'url' => ['/site/']];
-        //$menuItems[] = ['label' => 'Alumni Profile', 'url' => ['/site/my-profile']];
+
+        if(Yii::$app->user->can('Administrator')){
+            $menuItems[] = ['label' => 'User Management', 'url' => ['/user/admin']];
+        }
+
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
             . Html::submitButton(
