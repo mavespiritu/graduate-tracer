@@ -27,8 +27,10 @@ class VoucherCode extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['merchant', 'instruction'], 'required'],
             [['id'], 'integer'],
-            [['merchant', 'voucher_code'], 'string', 'max' => 100],
+            [['merchant', 'voucher_code', 'available'], 'string', 'max' => 100],
+            [['instruction'], 'string'],
         ];
     }
 
@@ -41,6 +43,8 @@ class VoucherCode extends \yii\db\ActiveRecord
             'id' => 'ID',
             'merchant' => 'Merchant',
             'voucher_code' => 'Voucher Code',
+            'instruction' => 'How To Claim',
+            'available' => 'Available?'
         ];
     }
 }

@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Rafał Sebestjański
+ * (c) 2010-2021 Rafał Sebestjański
  *
  * License: www.highcharts.com/license
  */
@@ -28,69 +28,34 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'mixins/indicator-required.js', [_modules['parts/Globals.js']], function (H) {
-        /**
-         * (c) 2010-2019 Daniel Studencki
-         *
-         * License: www.highcharts.com/license
-         */
-
-
-        var error = H.error;
-
-        var requiredIndicatorMixin = {
-            /**
-             * Check whether given indicator is loaded, else throw error.
-             * @param {function} indicator Indicator constructor function.
-             * @param {string} requiredIndicator required indicator type.
-             * @param {string} type Type of indicator where function was called (parent).
-             * @param {function} callback Callback which is triggered if the given
-             *                            indicator is loaded. Takes indicator as
-             *                            an argument.
-             * @param {string} errMessage Error message that will be logged in console.
-             * @returns {boolean} Returns false when there is no required indicator loaded.
-             */
-            isParentLoaded: function (
-                indicator,
-                requiredIndicator,
-                type,
-                callback,
-                errMessage
-            ) {
-                if (indicator) {
-                    return callback ? callback(indicator) : true;
-                }
-                error(
-                    errMessage || this.generateMessage(type, requiredIndicator)
-                );
-                return false;
-            },
-            generateMessage: function (indicatorType, required) {
-                return 'Error: "' + indicatorType +
-                    '" indicator type requires "' + required +
-                    '" indicator loaded before. Please read docs: ' +
-                    'https://api.highcharts.com/highstock/plotOptions.' +
-                    indicatorType;
-            }
-        };
-
-
-        return requiredIndicatorMixin;
-    });
-    _registerModule(_modules, 'indicators/dema.src.js', [_modules['parts/Globals.js'], _modules['mixins/indicator-required.js']], function (H, requiredIndicatorMixin) {
+    _registerModule(_modules, 'Stock/Indicators/DEMA/DEMAIndicator.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
         /* *
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
-        var isArray = H.isArray,
-            EMAindicator = H.seriesTypes.ema,
-            requiredIndicator = requiredIndicatorMixin,
-            correctFloat = H.correctFloat;
-
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var EMAIndicator = SeriesRegistry.seriesTypes.ema;
+        var correctFloat = U.correctFloat,
+            isArray = U.isArray,
+            merge = U.merge;
         /**
          * The DEMA series Type
          *
@@ -100,13 +65,96 @@
          *
          * @augments Highcharts.Series
          */
-        H.seriesType(
-            'dema',
-            'ema',
+        var DEMAIndicator = /** @class */ (function (_super) {
+                __extends(DEMAIndicator, _super);
+            function DEMAIndicator() {
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                _this.EMApercent = void 0;
+                _this.data = void 0;
+                _this.options = void 0;
+                _this.points = void 0;
+                return _this;
+            }
+            DEMAIndicator.prototype.getEMA = function (yVal, prevEMA, SMA, index, i, xVal) {
+                return EMAIndicator.prototype.calculateEma(xVal || [], yVal, typeof i === 'undefined' ? 1 : i, this.EMApercent, prevEMA, typeof index === 'undefined' ? -1 : index, SMA);
+            };
+            DEMAIndicator.prototype.getValues = function (series, params) {
+                var period = params.period,
+                    doubledPeriod = 2 * period,
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal ? yVal.length : 0,
+                    index = -1,
+                    accumulatePeriodPoints = 0,
+                    SMA = 0,
+                    DEMA = [],
+                    xDataDema = [],
+                    yDataDema = [],
+                    EMA = 0, 
+                    // EMA(EMA)
+                    EMAlevel2, 
+                    // EMA of previous point
+                    prevEMA,
+                    prevEMAlevel2, 
+                    // EMA values array
+                    EMAvalues = [],
+                    i,
+                    DEMAPoint;
+                this.EMApercent = (2 / (period + 1));
+                // Check period, if bigger than EMA points length, skip
+                if (yValLen < 2 * period - 1) {
+                    return;
+                }
+                // Switch index for OHLC / Candlestick / Arearange
+                if (isArray(yVal[0])) {
+                    index = params.index ? params.index : 0;
+                }
+                // Accumulate first N-points
+                accumulatePeriodPoints =
+                    EMAIndicator.prototype.accumulatePeriodPoints(period, index, yVal);
+                // first point
+                SMA = accumulatePeriodPoints / period;
+                accumulatePeriodPoints = 0;
+                // Calculate value one-by-one for each period in visible data
+                for (i = period; i < yValLen + 2; i++) {
+                    if (i < yValLen + 1) {
+                        EMA = this.getEMA(yVal, prevEMA, SMA, index, i)[1];
+                        EMAvalues.push(EMA);
+                    }
+                    prevEMA = EMA;
+                    // Summing first period points for EMA(EMA)
+                    if (i < doubledPeriod) {
+                        accumulatePeriodPoints += EMA;
+                    }
+                    else {
+                        // Calculate DEMA
+                        // First DEMA point
+                        if (i === doubledPeriod) {
+                            SMA = accumulatePeriodPoints / period;
+                        }
+                        EMA = EMAvalues[i - period - 1];
+                        EMAlevel2 = this.getEMA([EMA], prevEMAlevel2, SMA)[1];
+                        DEMAPoint = [
+                            xVal[i - 2],
+                            correctFloat(2 * EMA - EMAlevel2)
+                        ];
+                        DEMA.push(DEMAPoint);
+                        xDataDema.push(DEMAPoint[0]);
+                        yDataDema.push(DEMAPoint[1]);
+                        prevEMAlevel2 = EMAlevel2;
+                    }
+                }
+                return {
+                    values: DEMA,
+                    xData: xDataDema,
+                    yData: yDataDema
+                };
+            };
             /**
-             * Normalized average true range indicator (NATR). This series requires
+             * Double exponential moving average (DEMA) indicator. This series requires
              * `linkedTo` option to be set and should be loaded after the
-             * `stock/indicators/indicators.js` and `stock/indicators/ema.js`.
+             * `stock/indicators/indicators.js`.
              *
              * @sample {highstock} stock/indicators/dema
              *         DEMA indicator
@@ -118,154 +166,36 @@
              *               navigatorOptions, pointInterval, pointIntervalUnit,
              *               pointPlacement, pointRange, pointStart, showInNavigator,
              *               stacking
+             * @requires     stock/indicators/indicators
+             * @requires     stock/indicators/dema
              * @optionparent plotOptions.dema
              */
-            {},
-            /**
-             * @lends Highcharts.Series#
-             */
-            {
-                init: function () {
-                    var args = arguments,
-                        ctx = this;
-
-                    requiredIndicator.isParentLoaded(
-                        EMAindicator,
-                        'ema',
-                        ctx.type,
-                        function (indicator) {
-                            indicator.prototype.init.apply(ctx, args);
-                        }
-                    );
-                },
-                getEMA: function (
-                    yVal,
-                    prevEMA,
-                    SMA,
-                    index,
-                    i,
-                    xVal
-                ) {
-
-                    return EMAindicator.prototype.calculateEma(
-                        xVal || [],
-                        yVal,
-                        i === undefined ? 1 : i,
-                        this.chart.series[0].EMApercent,
-                        prevEMA,
-                        index === undefined ? -1 : index,
-                        SMA
-                    );
-                },
-                getValues: function (series, params) {
-                    var period = params.period,
-                        doubledPeriod = 2 * period,
-                        xVal = series.xData,
-                        yVal = series.yData,
-                        yValLen = yVal ? yVal.length : 0,
-                        index = -1,
-                        accumulatePeriodPoints = 0,
-                        SMA = 0,
-                        DEMA = [],
-                        xDataDema = [],
-                        yDataDema = [],
-                        EMA = 0,
-                        // EMA(EMA)
-                        EMAlevel2,
-                        // EMA of previous point
-                        prevEMA,
-                        prevEMAlevel2,
-                        // EMA values array
-                        EMAvalues = [],
-                        i,
-                        DEMAPoint;
-
-                    series.EMApercent = (2 / (period + 1));
-
-                    // Check period, if bigger than EMA points length, skip
-                    if (yValLen < 2 * period - 1) {
-                        return false;
-                    }
-
-                    // Switch index for OHLC / Candlestick / Arearange
-                    if (isArray(yVal[0])) {
-                        index = params.index ? params.index : 0;
-                    }
-
-                    // Accumulate first N-points
-                    accumulatePeriodPoints =
-                        EMAindicator.prototype.accumulatePeriodPoints(
-                            period,
-                            index,
-                            yVal
-                        );
-
-                    // first point
-                    SMA = accumulatePeriodPoints / period;
-                    accumulatePeriodPoints = 0;
-
-                    // Calculate value one-by-one for each period in visible data
-                    for (i = period; i < yValLen + 2; i++) {
-                        if (i < yValLen + 1) {
-                            EMA = this.getEMA(
-                                yVal,
-                                prevEMA,
-                                SMA,
-                                index,
-                                i
-                            )[1];
-                            EMAvalues.push(EMA);
-                        }
-                        prevEMA = EMA;
-
-                        // Summing first period points for EMA(EMA)
-                        if (i < doubledPeriod) {
-                            accumulatePeriodPoints += EMA;
-                        } else {
-                            // Calculate DEMA
-                            // First DEMA point
-                            if (i === doubledPeriod) {
-                                SMA = accumulatePeriodPoints / period;
-                            }
-                            EMA = EMAvalues[i - period - 1];
-                            EMAlevel2 = this.getEMA(
-                                [EMA],
-                                prevEMAlevel2,
-                                SMA
-                            )[1];
-                            DEMAPoint = [
-                                xVal[i - 2],
-                                correctFloat(2 * EMA - EMAlevel2)
-                            ];
-                            DEMA.push(DEMAPoint);
-                            xDataDema.push(DEMAPoint[0]);
-                            yDataDema.push(DEMAPoint[1]);
-                            prevEMAlevel2 = EMAlevel2;
-                        }
-                    }
-
-                    return {
-                        values: DEMA,
-                        xData: xDataDema,
-                        yData: yDataDema
-                    };
-                }
-            }
-        );
-
+            DEMAIndicator.defaultOptions = merge(EMAIndicator.defaultOptions);
+            return DEMAIndicator;
+        }(EMAIndicator));
+        SeriesRegistry.registerSeriesType('dema', DEMAIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
         /**
-         * A `DEMA` series. If the [type](#series.ema.type) option is not
+         * A `DEMA` series. If the [type](#series.dema.type) option is not
          * specified, it is inherited from [chart.type](#chart.type).
          *
-         * @extends   series,plotOptions.ema
+         * @extends   series,plotOptions.dema
          * @since     7.0.0
          * @product   highstock
          * @excluding allAreas, colorAxis, compare, compareBase, dataParser, dataURL,
          *            joinBy, keys, navigatorOptions, pointInterval, pointIntervalUnit,
          *            pointPlacement, pointRange, pointStart, showInNavigator, stacking
+         * @requires  stock/indicators/indicators
+         * @requires  stock/indicators/dema
          * @apioption series.dema
          */
+        ''; // adds doclet above to the transpiled file
 
+        return DEMAIndicator;
     });
     _registerModule(_modules, 'masters/indicators/dema.src.js', [], function () {
 

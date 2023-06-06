@@ -76,7 +76,7 @@ $asset = AppAsset::register($this);
 
     .bg {
       /* The image used */
-      background-image: url("<?= $asset->baseUrl ?>/images/bg.jpg");
+      background-image: url("<?= $asset->baseUrl ?>/images/banner.jpg");
 
       /* Full height */
       height: 100vh;

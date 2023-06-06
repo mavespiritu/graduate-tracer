@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Wojciech Chmiel
+ * (c) 2010-2021 Wojciech Chmiel
  *
  * License: www.highcharts.com/license
  */
@@ -28,34 +28,59 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'mixins/multipe-lines.js', [_modules['parts/Globals.js']], function (H) {
+    _registerModule(_modules, 'Stock/Indicators/MultipleLinesComposition.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
         /**
          *
-         *  (c) 2010-2019 Wojciech Chmiel
+         *  (c) 2010-2021 Wojciech Chmiel
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
-        var each = H.each,
-            merge = H.merge,
-            error = H.error,
-            defined = H.defined,
-            SMA = H.seriesTypes.sma;
-
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var defined = U.defined,
+            error = U.error,
+            merge = U.merge;
+        /* *
+         *
+         *  Composition
+         *
+         * */
         /**
-         * Mixin useful for all indicators that have more than one line.
-         * Merge it with your implementation where you will provide
-         * getValues method appropriate to your indicator and pointArrayMap,
-         * pointValKey, linesApiNames properites. Notice that pointArrayMap
-         * should be consistent with amount of lines calculated in getValues method.
+         * Composition useful for all indicators that have more than one line. Compose
+         * it with your implementation where you will provide the `getValues` method
+         * appropriate to your indicator and `pointArrayMap`, `pointValKey`,
+         * `linesApiNames` properties. Notice that `pointArrayMap` should be consistent
+         * with the amount of lines calculated in the `getValues` method.
          *
          * @private
          * @mixin multipleLinesMixin
          */
-        var multipleLinesMixin = {
+        var MultipleLinesComposition;
+        (function (MultipleLinesComposition) {
+            /* *
+             *
+             *  Declarations
+             *
+             * */
+            /* *
+             *
+             *  Constants
+             *
+             * */
+            var composedClasses = [];
+            /**
+             * Additional lines DOCS names. Elements of linesApiNames array should
+             * be consistent with DOCS line names defined in your implementation.
+             * Notice that linesApiNames should have decreased amount of elements
+             * relative to pointArrayMap (without pointValKey).
+             *
+             * @private
+             * @name multipleLinesMixin.linesApiNames
+             * @type {Array<string>}
+             */
+            var linesApiNames = ['bottomLine'];
             /**
              * Lines ids. Required to plot appropriate amount of lines.
              * Notice that pointArrayMap should have more elements than
@@ -67,8 +92,17 @@
              * @name multipleLinesMixin.pointArrayMap
              * @type {Array<string>}
              */
-            pointArrayMap: ['top', 'bottom'],
-
+            var pointArrayMap = ['top', 'bottom'];
+            /**
+             * Names of the lines, bewteen which the area should be plotted.
+             * If the drawing of the area should
+             * be disabled for some indicators, leave this option as an empty array.
+             * Names should be the same as the names in the pointArrayMap.
+             * @private
+             * @name multipleLinesMixin.areaLinesNames
+             * @type {Array<string>}
+             */
+            var areaLinesNames = ['top'];
             /**
              * Main line id.
              *
@@ -76,125 +110,95 @@
              * @name multipleLinesMixin.pointValKey
              * @type {string}
              */
-            pointValKey: 'top',
-
-            /**
-             * Additional lines DOCS names. Elements of linesApiNames array should
-             * be consistent with DOCS line names defined in your implementation.
-             * Notice that linesApiNames should have decreased amount of elements
-             * relative to pointArrayMap (without pointValKey).
+            var pointValKey = 'top';
+            /* *
              *
-             * @private
-             * @name multipleLinesMixin.linesApiNames
-             * @type {Array<string>}
-             */
-            linesApiNames: ['bottomLine'],
-
-            /**
-             * Create translatedLines Collection based on pointArrayMap.
+             *  Functions
              *
-             * @private
-             * @function multipleLinesMixin.getTranslatedLinesNames
-             *
-             * @param {string} excludedValue
-             *        pointValKey - main line id
-             *
-             * @return {Array<string>}
-             *         Returns translated lines names without excluded value.
-             */
-            getTranslatedLinesNames: function (excludedValue) {
-                var translatedLines = [];
-
-                each(this.pointArrayMap, function (propertyName) {
-                    if (propertyName !== excludedValue) {
-                        translatedLines.push(
-                            'plot' +
-                            propertyName.charAt(0).toUpperCase() +
-                            propertyName.slice(1)
-                        );
-                    }
-                });
-
-                return translatedLines;
-            },
+             * */
+            /* eslint-disable valid-jsdoc */
             /**
              * @private
-             * @function multipleLinesMixin.toYData
-             *
-             * @param {string} point
-             *
-             * @return {Array<number>}
-             *         Returns point Y value for all lines
              */
-            toYData: function (point) {
-                var pointColl = [];
-
-                each(this.pointArrayMap, function (propertyName) {
-                    pointColl.push(point[propertyName]);
-                });
-                return pointColl;
-            },
+            function compose(IndicatorClass) {
+                if (composedClasses.indexOf(IndicatorClass) === -1) {
+                    composedClasses.push(IndicatorClass);
+                    var proto = IndicatorClass.prototype;
+                    proto.linesApiNames = (proto.linesApiNames ||
+                        linesApiNames.slice());
+                    proto.pointArrayMap = (proto.pointArrayMap ||
+                        pointArrayMap.slice());
+                    proto.pointValKey = (proto.pointValKey ||
+                        pointValKey);
+                    proto.areaLinesNames = (proto.areaLinesNames ||
+                        areaLinesNames.slice());
+                    proto.drawGraph = drawGraph;
+                    proto.getGraphPath = getGraphPath;
+                    proto.toYData = toYData;
+                    proto.translate = translate;
+                    proto.getTranslatedLinesNames = getTranslatedLinesNames;
+                }
+                return IndicatorClass;
+            }
+            MultipleLinesComposition.compose = compose;
             /**
-             * Add lines plot pixel values.
+             * Create the path based on points provided as argument.
+             * If indicator.nextPoints option is defined, create the areaFill.
              *
-             * @private
-             * @function multipleLinesMixin.translate
+             * @param points Points on which the path should be created
              */
-            translate: function () {
-                var indicator = this,
-                    pointArrayMap = indicator.pointArrayMap,
-                    LinesNames = [],
-                    value;
-
-                LinesNames = indicator.getTranslatedLinesNames();
-
-                SMA.prototype.translate.apply(indicator, arguments);
-
-                each(indicator.points, function (point) {
-                    each(pointArrayMap, function (propertyName, i) {
-                        value = point[propertyName];
-
-                        if (value !== null) {
-                            point[LinesNames[i]] = indicator.yAxis.toPixels(
-                                value,
-                                true
-                            );
+            function getGraphPath(points) {
+                var indicator = this;
+                var areaPath,
+                    path = [],
+                    higherAreaPath = [];
+                points = points || this.points;
+                // Render Span
+                if (indicator.fillGraph && indicator.nextPoints) {
+                    areaPath = SMAIndicator.prototype.getGraphPath.call(indicator, indicator.nextPoints);
+                    if (areaPath && areaPath.length) {
+                        areaPath[0][0] = 'L';
+                        path = SMAIndicator.prototype.getGraphPath.call(indicator, points);
+                        higherAreaPath = areaPath.slice(0, path.length);
+                        // Reverse points, so that the areaFill will start from the end:
+                        for (var i = higherAreaPath.length - 1; i >= 0; i--) {
+                            path.push(higherAreaPath[i]);
                         }
-                    });
-                });
-            },
+                    }
+                }
+                else {
+                    path = SMAIndicator.prototype.getGraphPath.apply(indicator, arguments);
+                }
+                return path;
+            }
             /**
              * Draw main and additional lines.
              *
              * @private
              * @function multipleLinesMixin.drawGraph
              */
-            drawGraph: function () {
+            function drawGraph() {
                 var indicator = this,
                     pointValKey = indicator.pointValKey,
                     linesApiNames = indicator.linesApiNames,
+                    areaLinesNames = indicator.areaLinesNames,
                     mainLinePoints = indicator.points,
-                    pointsLength = mainLinePoints.length,
                     mainLineOptions = indicator.options,
                     mainLinePath = indicator.graph,
                     gappedExtend = {
                         options: {
                             gapSize: mainLineOptions.gapSize
                         }
-                    },
-                    secondaryLines = [], // additional lines point place holders
-                    secondaryLinesNames = indicator.getTranslatedLinesNames(
-                        pointValKey
-                    ),
+                    }, 
+                    // additional lines point place holders:
+                    secondaryLines = [],
+                    secondaryLinesNames = indicator.getTranslatedLinesNames(pointValKey);
+                var pointsLength = mainLinePoints.length,
                     point;
-
-
                 // Generate points for additional lines:
-                each(secondaryLinesNames, function (plotLine, index) {
-
+                secondaryLinesNames.forEach(function (plotLine, index) {
                     // create additional lines point place holders
                     secondaryLines[index] = [];
-
                     while (pointsLength--) {
                         point = mainLinePoints[pointsLength];
                         secondaryLines[index].push({
@@ -204,83 +208,191 @@
                             isNull: !defined(point[plotLine])
                         });
                     }
-
                     pointsLength = mainLinePoints.length;
                 });
-
+                // Modify options and generate area fill:
+                if (this.userOptions.fillColor && areaLinesNames.length) {
+                    var index = secondaryLinesNames.indexOf(getLineName(areaLinesNames[0])),
+                        secondLinePoints = secondaryLines[index],
+                        firstLinePoints = areaLinesNames.length === 1 ?
+                            mainLinePoints :
+                            secondaryLines[secondaryLinesNames.indexOf(getLineName(areaLinesNames[1]))],
+                        originalColor = indicator.color;
+                    indicator.points = firstLinePoints;
+                    indicator.nextPoints = secondLinePoints;
+                    indicator.color = this.userOptions.fillColor;
+                    indicator.options = merge(mainLinePoints, gappedExtend);
+                    indicator.graph = indicator.area;
+                    indicator.fillGraph = true;
+                    SeriesRegistry.seriesTypes.sma.prototype.drawGraph.call(indicator);
+                    indicator.area = indicator.graph;
+                    // Clean temporary properties:
+                    delete indicator.nextPoints;
+                    delete indicator.fillGraph;
+                    indicator.color = originalColor;
+                }
                 // Modify options and generate additional lines:
-                each(linesApiNames, function (lineName, i) {
+                linesApiNames.forEach(function (lineName, i) {
                     if (secondaryLines[i]) {
                         indicator.points = secondaryLines[i];
                         if (mainLineOptions[lineName]) {
-                            indicator.options = merge(
-                                mainLineOptions[lineName].styles,
-                                gappedExtend
-                            );
-                        } else {
-                            error(
-                                'Error: "There is no ' + lineName +
+                            indicator.options = merge(mainLineOptions[lineName].styles, gappedExtend);
+                        }
+                        else {
+                            error('Error: "There is no ' + lineName +
                                 ' in DOCS options declared. Check if linesApiNames' +
                                 ' are consistent with your DOCS line names."' +
-                                ' at mixin/multiple-line.js:34'
-                            );
+                                ' at mixin/multiple-line.js:34');
                         }
-
                         indicator.graph = indicator['graph' + lineName];
-                        SMA.prototype.drawGraph.call(indicator);
-
+                        SMAIndicator.prototype.drawGraph.call(indicator);
                         // Now save lines:
                         indicator['graph' + lineName] = indicator.graph;
-                    } else {
-                        error(
-                            'Error: "' + lineName + ' doesn\'t have equivalent ' +
+                    }
+                    else {
+                        error('Error: "' + lineName + ' doesn\'t have equivalent ' +
                             'in pointArrayMap. To many elements in linesApiNames ' +
-                            'relative to pointArrayMap."'
-                        );
+                            'relative to pointArrayMap."');
                     }
                 });
-
                 // Restore options and draw a main line:
                 indicator.points = mainLinePoints;
                 indicator.options = mainLineOptions;
                 indicator.graph = mainLinePath;
-                SMA.prototype.drawGraph.call(indicator);
+                SMAIndicator.prototype.drawGraph.call(indicator);
             }
-        };
+            /**
+             * Create translatedLines Collection based on pointArrayMap.
+             *
+             * @private
+             * @function multipleLinesMixin.getTranslatedLinesNames
+             * @param {string} [excludedValue]
+             *        Main line id
+             * @return {Array<string>}
+             *         Returns translated lines names without excluded value.
+             */
+            function getTranslatedLinesNames(excludedValue) {
+                var translatedLines = [];
+                (this.pointArrayMap || []).forEach(function (propertyName) {
+                    if (propertyName !== excludedValue) {
+                        translatedLines.push(getLineName(propertyName));
+                    }
+                });
+                return translatedLines;
+            }
+            /**
+             * Generate the API name of the line
+             * @param propertyName name of the line
+             */
+            function getLineName(propertyName) {
+                return ('plot' +
+                    propertyName.charAt(0).toUpperCase() +
+                    propertyName.slice(1));
+            }
+            /**
+             * @private
+             * @function multipleLinesMixin.toYData
+             * @param {Highcharts.Point} point
+             *        Indicator point
+             * @return {Array<number>}
+             *         Returns point Y value for all lines
+             */
+            function toYData(point) {
+                var pointColl = [];
+                (this.pointArrayMap || []).forEach(function (propertyName) {
+                    pointColl.push(point[propertyName]);
+                });
+                return pointColl;
+            }
+            /**
+             * Add lines plot pixel values.
+             *
+             * @private
+             * @function multipleLinesMixin.translate
+             */
+            function translate() {
+                var indicator = this,
+                    pointArrayMap = indicator.pointArrayMap;
+                var LinesNames = [],
+                    value;
+                LinesNames = indicator.getTranslatedLinesNames();
+                SMAIndicator.prototype.translate.apply(indicator, arguments);
+                indicator.points.forEach(function (point) {
+                    pointArrayMap.forEach(function (propertyName, i) {
+                        value = point[propertyName];
+                        // If the modifier, like for example compare exists,
+                        // modified the original value by that method, #15867.
+                        if (indicator.dataModify) {
+                            value = indicator.dataModify.modifyValue(value);
+                        }
+                        if (value !== null) {
+                            point[LinesNames[i]] = indicator.yAxis.toPixels(value, true);
+                        }
+                    });
+                });
+            }
+        })(MultipleLinesComposition || (MultipleLinesComposition = {}));
+        /* *
+         *
+         *  Default Export
+         *
+         * */
 
-
-        return multipleLinesMixin;
+        return MultipleLinesComposition;
     });
-    _registerModule(_modules, 'indicators/aroon.src.js', [_modules['parts/Globals.js'], _modules['mixins/multipe-lines.js']], function (H, multipleLinesMixin) {
+    _registerModule(_modules, 'Stock/Indicators/Aroon/AroonIndicator.js', [_modules['Stock/Indicators/MultipleLinesComposition.js'], _modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (MultipleLinesComposition, SeriesRegistry, U) {
         /* *
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var extend = U.extend,
+            merge = U.merge,
+            pick = U.pick;
+        /* eslint-disable valid-jsdoc */
         // Utils
-
         // Index of element with extreme value from array (min or max)
+        /**
+         * @private
+         */
         function getExtremeIndexInArray(arr, extreme) {
             var extremeValue = arr[0],
                 valueIndex = 0,
                 i;
-
             for (i = 1; i < arr.length; i++) {
-                if (
-                    extreme === 'max' && arr[i] >= extremeValue ||
-                    extreme === 'min' && arr[i] <= extremeValue
-                ) {
+                if (extreme === 'max' && arr[i] >= extremeValue ||
+                    extreme === 'min' && arr[i] <= extremeValue) {
                     extremeValue = arr[i];
                     valueIndex = i;
                 }
             }
-
             return valueIndex;
         }
-
+        /* eslint-enable valid-jsdoc */
+        /* *
+         *
+         *  Class
+         *
+         * */
         /**
          * The Aroon series type.
          *
@@ -290,9 +402,68 @@
          *
          * @augments Highcharts.Series
          */
-        H.seriesType(
-            'aroon',
-            'sma',
+        var AroonIndicator = /** @class */ (function (_super) {
+                __extends(AroonIndicator, _super);
+            function AroonIndicator() {
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                /* *
+                 *
+                 *  Properties
+                 *
+                 * */
+                _this.data = void 0;
+                _this.options = void 0;
+                _this.points = void 0;
+                return _this;
+            }
+            /* *
+             *
+             *  Functions
+             *
+             * */
+            AroonIndicator.prototype.getValues = function (series, params) {
+                var period = params.period,
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal ? yVal.length : 0, 
+                    // 0- date, 1- Aroon Up, 2- Aroon Down
+                    AR = [],
+                    xData = [],
+                    yData = [],
+                    slicedY,
+                    low = 2,
+                    high = 1,
+                    aroonUp,
+                    aroonDown,
+                    xLow,
+                    xHigh,
+                    i;
+                // For a N-period, we start from N-1 point, to calculate Nth point
+                // That is why we later need to comprehend slice() elements list
+                // with (+1)
+                for (i = period - 1; i < yValLen; i++) {
+                    slicedY = yVal.slice(i - period + 1, i + 2);
+                    xLow = getExtremeIndexInArray(slicedY.map(function (elem) {
+                        return pick(elem[low], elem);
+                    }), 'min');
+                    xHigh = getExtremeIndexInArray(slicedY.map(function (elem) {
+                        return pick(elem[high], elem);
+                    }), 'max');
+                    aroonUp = (xHigh / period) * 100;
+                    aroonDown = (xLow / period) * 100;
+                    if (xVal[i + 1]) {
+                        AR.push([xVal[i + 1], aroonUp, aroonDown]);
+                        xData.push(xVal[i + 1]);
+                        yData.push([aroonUp, aroonDown]);
+                    }
+                }
+                return {
+                    values: AR,
+                    xData: xData,
+                    yData: yData
+                };
+            };
             /**
              * Aroon. This series requires the `linkedTo` option to be
              * set and should be loaded after the `stock/indicators/indicators.js`.
@@ -307,18 +478,18 @@
              *               navigatorOptions, pointInterval, pointIntervalUnit,
              *               pointPlacement, pointRange, pointStart, showInNavigator,
              *               stacking
+             * @requires     stock/indicators/indicators
+             * @requires     stock/indicators/aroon
              * @optionparent plotOptions.aroon
              */
-            {
+            AroonIndicator.defaultOptions = merge(SMAIndicator.defaultOptions, {
                 /**
                  * Paramters used in calculation of aroon series points.
                  *
-                 * @excluding periods, index
+                 * @excluding index
                  */
                 params: {
-                    /**
-                     * Period for Aroon indicator
-                     */
+                    index: void 0,
                     period: 25
                 },
                 marker: {
@@ -345,71 +516,29 @@
                          *
                          * @type {Highcharts.ColorString}
                          */
-                        lineColor: undefined
+                        lineColor: void 0
                     }
                 },
                 dataGrouping: {
                     approximation: 'averages'
                 }
-            },
-            /**
-             * @lends Highcharts.Series#
-             */
-            H.merge(multipleLinesMixin, {
-                nameBase: 'Aroon',
-                pointArrayMap: ['y', 'aroonDown'],
-                pointValKey: 'y',
-                linesApiNames: ['aroonDown'],
-                getValues: function (series, params) {
-                    var period = params.period,
-                        xVal = series.xData,
-                        yVal = series.yData,
-                        yValLen = yVal ? yVal.length : 0,
-                        AR = [], // 0- date, 1- Aroon Up, 2- Aroon Down
-                        xData = [],
-                        yData = [],
-                        slicedY,
-                        low = 2,
-                        high = 1,
-                        aroonUp,
-                        aroonDown,
-                        xLow,
-                        xHigh,
-                        i;
-
-                    // For a N-period, we start from N-1 point, to calculate Nth point
-                    // That is why we later need to comprehend slice() elements list
-                    // with (+1)
-                    for (i = period - 1; i < yValLen; i++) {
-                        slicedY = yVal.slice(i - period + 1, i + 2);
-
-                        xLow = getExtremeIndexInArray(slicedY.map(function (elem) {
-                            return H.pick(elem[low], elem);
-                        }), 'min');
-
-                        xHigh = getExtremeIndexInArray(slicedY.map(function (elem) {
-                            return H.pick(elem[high], elem);
-                        }), 'max');
-
-                        aroonUp = (xHigh / period) * 100;
-                        aroonDown = (xLow / period) * 100;
-
-                        if (xVal[i + 1]) {
-                            AR.push([xVal[i + 1], aroonUp, aroonDown]);
-                            xData.push(xVal[i + 1]);
-                            yData.push([aroonUp, aroonDown]);
-                        }
-                    }
-
-                    return {
-                        values: AR,
-                        xData: xData,
-                        yData: yData
-                    };
-                }
-            })
-        );
-
+            });
+            return AroonIndicator;
+        }(SMAIndicator));
+        extend(AroonIndicator.prototype, {
+            areaLinesNames: [],
+            linesApiNames: ['aroonDown'],
+            nameBase: 'Aroon',
+            pointArrayMap: ['y', 'aroonDown'],
+            pointValKey: 'y'
+        });
+        MultipleLinesComposition.compose(AroonIndicator);
+        SeriesRegistry.registerSeriesType('aroon', AroonIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
         /**
          * A Aroon indicator. If the [type](#series.aroon.type) option is not
          * specified, it is inherited from [chart.type](#chart.type).
@@ -420,9 +549,13 @@
          * @excluding allAreas, colorAxis, compare, compareBase, dataParser, dataURL,
          *            joinBy, keys, navigatorOptions, pointInterval, pointIntervalUnit,
          *            pointPlacement, pointRange, pointStart, showInNavigator, stacking
+         * @requires  stock/indicators/indicators
+         * @requires  stock/indicators/aroon
          * @apioption series.aroon
          */
+        ''; // to avoid removal of the above jsdoc
 
+        return AroonIndicator;
     });
     _registerModule(_modules, 'masters/indicators/aroon.src.js', [], function () {
 

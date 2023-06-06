@@ -47,4 +47,12 @@ class VoucherCodeUser extends \yii\db\ActiveRecord
             'datetime' => 'Datetime',
         ];
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVoucherCode()
+    {
+        return $this->hasOne(VoucherCode::className(), ['id' => 'voucher_code_id']);
+    }
 }

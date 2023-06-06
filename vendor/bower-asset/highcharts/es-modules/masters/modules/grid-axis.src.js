@@ -1,13 +1,17 @@
 /**
- * @license @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts Gantt JS v9.3.3 (2022-02-01)
  * @module highcharts/modules/grid-axis
  * @requires highcharts
  *
  * GridAxis
  *
- * (c) 2016-2019 Lars A. V. Cabrera
+ * (c) 2016-2021 Lars A. V. Cabrera
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../parts-gantt/GridAxis.js';
+import Highcharts from '../../Core/Globals.js';
+import GridAxis from '../../Core/Axis/GridAxis.js';
+var G = Highcharts;
+// Compositions
+GridAxis.compose(G.Axis, G.Chart, G.Tick);

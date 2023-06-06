@@ -1,13 +1,13 @@
 /**
- * @license  @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts JS v9.3.3 (2022-02-01)
  * @module highcharts/modules/pareto
  * @requires highcharts
  *
  * Pareto series type for Highcharts
  *
- * (c) 2010-2019 Sebastian Bochan
+ * (c) 2010-2021 Sebastian Bochan
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../modules/pareto.src.js';
+import '../../Series/ParetoSeries/ParetoSeries.js';

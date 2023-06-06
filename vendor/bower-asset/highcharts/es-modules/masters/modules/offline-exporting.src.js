@@ -1,14 +1,20 @@
 /**
- * @license @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts JS v9.3.3 (2022-02-01)
  * @module highcharts/modules/offline-exporting
  * @requires highcharts
  * @requires highcharts/modules/exporting
  *
  * Client side exporting module
  *
- * (c) 2015-2019 Torstein Honsi / Oystein Moseng
+ * (c) 2015-2021 Torstein Honsi / Oystein Moseng
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../modules/offline-exporting.src.js';
+import Highcharts from '../../Core/Globals.js';
+import OfflineExporting from '../../Extensions/OfflineExporting/OfflineExporting.js';
+var G = Highcharts;
+// Compatibility
+G.downloadSVGLocal = OfflineExporting.downloadSVGLocal;
+// Compose
+OfflineExporting.compose(G.Chart);

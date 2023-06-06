@@ -30,8 +30,8 @@ class Badge extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['stage'], 'integer'],
-            [['title'], 'string'],
+            [['question_id'], 'integer'],
+            [['title', 'answer', 'description'], 'string'],
             [['table'], 'string', 'max' => 200],
         ];
     }
@@ -43,9 +43,10 @@ class Badge extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'stage' => 'Stage',
+            'question_id' => 'Question ID',
             'title' => 'Title',
-            'table' => 'Table',
+            'answer' => 'Answer',
+            'description' => 'Description',
         ];
     }
 

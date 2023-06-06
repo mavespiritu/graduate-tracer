@@ -76,8 +76,8 @@ $scrollbar-track-background: $neutral-color-5 !default;
 $scrollbar-track-border: $neutral-color-5 !default;
 
 // Indicators
-$indicator-positive-line: #06B535;
-$indicator-negative-line: #F21313;
+$positive-color: #06b535; // Positive indicator color
+$negative-color: #f21313; // Negative indicator color
 
 .highcharts-container {
     position: relative;
@@ -90,6 +90,9 @@ $indicator-negative-line: #F21313;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     font-family: $font-family;
     font-size: 12px;
+    user-select: none;
+    touch-action: manipulation;
+    outline: none;
 }
 .highcharts-root {
     display: block;
@@ -136,6 +139,7 @@ $indicator-negative-line: #F21313;
 }
 .highcharts-subtitle {
     fill: $neutral-color-60;
+    font-size: $subtitle-font-size;
 }
 
 /* Axes */
@@ -214,6 +218,9 @@ $indicator-negative-line: #F21313;
     fill: $tooltip-background;
     fill-opacity: 0.85;
 }
+div.highcharts-tooltip {
+    filter: none;
+}
 
 .highcharts-selection-marker {
     fill: $highlight-color-80;
@@ -226,16 +233,33 @@ $indicator-negative-line: #F21313;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+.highcharts-empty-series {
+    stroke-width: 1px;
+    fill: none;
+    stroke: $neutral-color-20;
+}
+
 .highcharts-state-hover .highcharts-graph {
     stroke-width: 3;
 }
+
+.highcharts-point-inactive {
+    opacity: 0.2;
+    transition: opacity 50ms; /* quick in */
+}
+
+.highcharts-series-inactive {
+    opacity: 0.2;
+    transition: opacity 50ms; /* quick in */
+}
+
 .highcharts-state-hover path {
-    transition: stroke-width 50; /* quick in */
+    transition: stroke-width 50ms; /* quick in */
 }
 .highcharts-state-normal path {
     transition: stroke-width 250ms; /* slow out */
 }
-
 /* Legend hover affects points and series */
 g.highcharts-series,
 .highcharts-point,
@@ -269,6 +293,10 @@ g.highcharts-series,
     stroke-width: 1px;
     stroke: $background-color;
 }
+.highcharts-a11y-markers-hidden .highcharts-point:not(.highcharts-point-hover):not(.highcharts-a11y-marker-visible),
+.highcharts-a11y-marker-hidden {
+    opacity: 0;
+}
 .highcharts-point {
     stroke-width: 1px;
 }
@@ -289,6 +317,9 @@ g.highcharts-series,
 }
 .highcharts-data-label-connector {
     fill: none;
+}
+.highcharts-data-label-hidden {
+    pointer-events: none;
 }
 .highcharts-halo {
     fill-opacity: 0.25;
@@ -369,7 +400,28 @@ g.highcharts-series,
     fill-opacity: 0.75;
 }
 
+.highcharts-vector-series .highcharts-point {
+    fill: none;
+    stroke-width: 2px;
+}
 
+.highcharts-windbarb-series .highcharts-point {
+    fill: none;
+    stroke-width: 2px;
+ }
+
+.highcharts-lollipop-stem {
+	stroke: $neutral-color-100;
+}
+
+.highcharts-focus-border {
+    fill: none;
+    stroke-width: 2px;
+}
+
+.highcharts-legend-item-hidden .highcharts-focus-border {
+    fill: none !important;
+}
 
 /* Legend */
 .highcharts-legend-box {
@@ -637,6 +689,18 @@ input.highcharts-range-selector {
 .highcharts-candlestick-series .highcharts-point-up {
     fill: $background-color;
 }
+.highcharts-hollowcandlestick-series .highcharts-point-down {
+    fill: $negative-color;
+    stroke: $negative-color;
+}
+.highcharts-hollowcandlestick-series .highcharts-point-down-bearish-up {
+    fill: $positive-color;
+    stroke: $positive-color;
+}
+.highcharts-hollowcandlestick-series .highcharts-point-up {
+    fill: transparent;
+    stroke: $positive-color;
+}
 .highcharts-ohlc-series .highcharts-point-hover {
     stroke-width: 3px;
 }
@@ -776,6 +840,46 @@ text.highcharts-drilldown-data-label,
     fill: $neutral-color-10;
 }
 
+/* A11y module */
+.highcharts-a11y-proxy-button {
+    border-width: 0;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+    opacity: 0.001;
+    z-index: 999;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: block;
+    position: absolute;
+}
+.highcharts-a11y-proxy-group li {
+    list-style: none;
+}
+.highcharts-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip: rect(1px, 1px, 1px, 1px);
+    margin-top: -3px;
+    opacity: 0.01;
+}
+.highcharts-a11y-invisible {
+    visibility: hidden;
+}
+.highcharts-a11y-proxy-container,
+.highcharts-a11y-proxy-container-before,
+.highcharts-a11y-proxy-container-after {
+    position: absolute;
+    white-space: nowrap;
+}
+g.highcharts-series, .highcharts-markers, .highcharts-point {
+    outline: none;
+}
+
 /* Gantt */
 .highcharts-treegrid-node-collapsed, .highcharts-treegrid-node-expanded {
     cursor: pointer;
@@ -789,3 +893,4 @@ text.highcharts-drilldown-data-label,
 .highcharts-grid-axis .highcharts-axis-line {
     stroke-width: 1px;
 }
+

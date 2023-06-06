@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Kacper Madej
+ * (c) 2010-2021 Kacper Madej
  *
  * License: www.highcharts.com/license
  */
@@ -28,20 +28,40 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'indicators/zigzag.src.js', [_modules['parts/Globals.js']], function (H) {
+    _registerModule(_modules, 'Stock/Indicators/Zigzag/ZigzagIndicator.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
         /* *
          *
-         *  (c) 2010-2019 Kacper Madej
+         *  (c) 2010-2021 Kacper Madej
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
-        var seriesType = H.seriesType,
-            UNDEFINED;
-
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var merge = U.merge,
+            extend = U.extend;
+        /* *
+         *
+         * Class
+         *
+         * */
         /**
          * The Zig Zag series type.
          *
@@ -51,9 +71,137 @@
          *
          * @augments Highcharts.Series
          */
-        seriesType(
-            'zigzag',
-            'sma',
+        var ZigzagIndicator = /** @class */ (function (_super) {
+                __extends(ZigzagIndicator, _super);
+            function ZigzagIndicator() {
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                /* *
+                 *
+                 *  Properties
+                 *
+                 * */
+                _this.data = void 0;
+                _this.points = void 0;
+                _this.options = void 0;
+                return _this;
+            }
+            /* *
+             *
+             *  Functions
+             *
+             * */
+            ZigzagIndicator.prototype.getValues = function (series, params) {
+                var lowIndex = params.lowIndex,
+                    highIndex = params.highIndex,
+                    deviation = params.deviation / 100,
+                    deviations = {
+                        'low': 1 + deviation,
+                        'high': 1 - deviation
+                    },
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal ? yVal.length : 0,
+                    zigzag = [],
+                    xData = [],
+                    yData = [],
+                    i,
+                    j,
+                    zigzagPoint,
+                    firstZigzagLow,
+                    firstZigzagHigh,
+                    directionUp,
+                    zigzagLen,
+                    exitLoop = false,
+                    yIndex = false;
+                // Exit if not enught points or no low or high values
+                if (!xVal || xVal.length <= 1 ||
+                    (yValLen &&
+                        (typeof yVal[0][lowIndex] === 'undefined' ||
+                            typeof yVal[0][highIndex] === 'undefined'))) {
+                    return;
+                }
+                // Set first zigzag point candidate
+                firstZigzagLow = yVal[0][lowIndex];
+                firstZigzagHigh = yVal[0][highIndex];
+                // Search for a second zigzag point candidate,
+                // this will also set first zigzag point
+                for (i = 1; i < yValLen; i++) {
+                    // requried change to go down
+                    if (yVal[i][lowIndex] <= firstZigzagHigh * deviations.high) {
+                        zigzag.push([xVal[0], firstZigzagHigh]);
+                        // second zigzag point candidate
+                        zigzagPoint = [xVal[i], yVal[i][lowIndex]];
+                        // next line will be going up
+                        directionUp = true;
+                        exitLoop = true;
+                        // requried change to go up
+                    }
+                    else if (yVal[i][highIndex] >= firstZigzagLow * deviations.low) {
+                        zigzag.push([xVal[0], firstZigzagLow]);
+                        // second zigzag point candidate
+                        zigzagPoint = [xVal[i], yVal[i][highIndex]];
+                        // next line will be going down
+                        directionUp = false;
+                        exitLoop = true;
+                    }
+                    if (exitLoop) {
+                        xData.push(zigzag[0][0]);
+                        yData.push(zigzag[0][1]);
+                        j = i++;
+                        i = yValLen;
+                    }
+                }
+                // Search for next zigzags
+                for (i = j; i < yValLen; i++) {
+                    if (directionUp) { // next line up
+                        // lower when going down -> change zigzag candidate
+                        if (yVal[i][lowIndex] <= zigzagPoint[1]) {
+                            zigzagPoint = [xVal[i], yVal[i][lowIndex]];
+                        }
+                        // requried change to go down -> new zigzagpoint and
+                        // direction change
+                        if (yVal[i][highIndex] >=
+                            zigzagPoint[1] * deviations.low) {
+                            yIndex = highIndex;
+                        }
+                    }
+                    else { // next line down
+                        // higher when going up -> change zigzag candidate
+                        if (yVal[i][highIndex] >= zigzagPoint[1]) {
+                            zigzagPoint = [xVal[i], yVal[i][highIndex]];
+                        }
+                        // requried change to go down -> new zigzagpoint and
+                        // direction change
+                        if (yVal[i][lowIndex] <=
+                            zigzagPoint[1] * deviations.high) {
+                            yIndex = lowIndex;
+                        }
+                    }
+                    if (yIndex !== false) { // new zigzag point and direction change
+                        zigzag.push(zigzagPoint);
+                        xData.push(zigzagPoint[0]);
+                        yData.push(zigzagPoint[1]);
+                        zigzagPoint = [xVal[i], yVal[i][yIndex]];
+                        directionUp = !directionUp;
+                        yIndex = false;
+                    }
+                }
+                zigzagLen = zigzag.length;
+                // no zigzag for last point
+                if (zigzagLen !== 0 &&
+                    zigzag[zigzagLen - 1][0] < xVal[yValLen - 1]) {
+                    // set last point from zigzag candidate
+                    zigzag.push(zigzagPoint);
+                    xData.push(zigzagPoint[0]);
+                    yData.push(zigzagPoint[1]);
+                }
+                return {
+                    values: zigzag,
+                    xData: xData,
+                    yData: yData
+                };
+            };
             /**
              * Zig Zag indicator.
              *
@@ -65,13 +213,18 @@
              * @extends      plotOptions.sma
              * @since        6.0.0
              * @product      highstock
+             * @requires     stock/indicators/indicators
+             * @requires     stock/indicators/zigzag
              * @optionparent plotOptions.zigzag
              */
-            {
+            ZigzagIndicator.defaultOptions = merge(SMAIndicator.defaultOptions, {
                 /**
                  * @excluding index, period
                  */
                 params: {
+                    // Index and period are unchangeable, do not inherit (#15362)
+                    index: void 0,
+                    period: void 0,
                     /**
                      * The point index which indicator calculations will base - low
                      * value.
@@ -96,147 +249,20 @@
                      */
                     deviation: 1
                 }
-            },
-            /**
-             * @lends Highcharts.Series#
-             */
-            {
-                nameComponents: ['deviation'],
-                nameSuffixes: ['%'],
-                nameBase: 'Zig Zag',
-                getValues: function (series, params) {
-                    var lowIndex = params.lowIndex,
-                        highIndex = params.highIndex,
-                        deviation = params.deviation / 100,
-                        deviations = {
-                            'low': 1 + deviation,
-                            'high': 1 - deviation
-                        },
-                        xVal = series.xData,
-                        yVal = series.yData,
-                        yValLen = yVal ? yVal.length : 0,
-                        Zigzag = [],
-                        xData = [],
-                        yData = [],
-                        i, j,
-                        ZigzagPoint,
-                        firstZigzagLow,
-                        firstZigzagHigh,
-                        directionUp,
-                        zigZagLen,
-                        exitLoop = false,
-                        yIndex = false;
-
-                    // Exit if not enught points or no low or high values
-                    if (
-                        xVal.length <= 1 ||
-                        (
-                            yValLen &&
-                            (
-                                yVal[0][lowIndex] === UNDEFINED ||
-                                yVal[0][highIndex] === UNDEFINED
-                            )
-                        )
-                    ) {
-                        return false;
-                    }
-
-                    // Set first zigzag point candidate
-                    firstZigzagLow = yVal[0][lowIndex];
-                    firstZigzagHigh = yVal[0][highIndex];
-
-                    // Search for a second zigzag point candidate,
-                    // this will also set first zigzag point
-                    for (i = 1; i < yValLen; i++) {
-                        // requried change to go down
-                        if (yVal[i][lowIndex] <= firstZigzagHigh * deviations.high) {
-                            Zigzag.push([xVal[0], firstZigzagHigh]);
-                            // second zigzag point candidate
-                            ZigzagPoint = [xVal[i], yVal[i][lowIndex]];
-                            // next line will be going up
-                            directionUp = true;
-                            exitLoop = true;
-
-                            // requried change to go up
-                        } else if (
-                            yVal[i][highIndex] >= firstZigzagLow * deviations.low
-                        ) {
-                            Zigzag.push([xVal[0], firstZigzagLow]);
-                            // second zigzag point candidate
-                            ZigzagPoint = [xVal[i], yVal[i][highIndex]];
-                            // next line will be going down
-                            directionUp = false;
-                            exitLoop = true;
-
-                        }
-                        if (exitLoop) {
-                            xData.push(Zigzag[0][0]);
-                            yData.push(Zigzag[0][1]);
-                            j = i++;
-                            i = yValLen;
-                        }
-                    }
-
-                    // Search for next zigzags
-                    for (i = j; i < yValLen; i++) {
-                        if (directionUp) { // next line up
-
-                            // lower when going down -> change zigzag candidate
-                            if (yVal[i][lowIndex] <= ZigzagPoint[1]) {
-                                ZigzagPoint = [xVal[i], yVal[i][lowIndex]];
-                            }
-
-                            // requried change to go down -> new zigzagpoint and
-                            // direction change
-                            if (yVal[i][highIndex] >= ZigzagPoint[1] * deviations.low) {
-                                yIndex = highIndex;
-                            }
-
-                        } else { // next line down
-
-                            // higher when going up -> change zigzag candidate
-                            if (yVal[i][highIndex] >= ZigzagPoint[1]) {
-                                ZigzagPoint = [xVal[i], yVal[i][highIndex]];
-                            }
-
-                            // requried change to go down -> new zigzagpoint and
-                            // direction change
-                            if (yVal[i][lowIndex] <= ZigzagPoint[1] * deviations.high) {
-                                yIndex = lowIndex;
-                            }
-                        }
-                        if (yIndex !== false) { // new zigzag point and direction change
-                            Zigzag.push(ZigzagPoint);
-                            xData.push(ZigzagPoint[0]);
-                            yData.push(ZigzagPoint[1]);
-                            ZigzagPoint = [xVal[i], yVal[i][yIndex]];
-                            directionUp = !directionUp;
-
-                            yIndex = false;
-                        }
-                    }
-
-                    zigZagLen = Zigzag.length;
-
-                    // no zigzag for last point
-                    if (
-                        zigZagLen !== 0 &&
-                        Zigzag[zigZagLen - 1][0] < xVal[yValLen - 1]
-                    ) {
-                        // set last point from zigzag candidate
-                        Zigzag.push(ZigzagPoint);
-                        xData.push(ZigzagPoint[0]);
-                        yData.push(ZigzagPoint[1]);
-                    }
-                    return {
-                        values: Zigzag,
-                        xData: xData,
-                        yData: yData
-                    };
-                }
-            }
-        );
-
+            });
+            return ZigzagIndicator;
+        }(SMAIndicator));
+        extend(ZigzagIndicator.prototype, {
+            nameComponents: ['deviation'],
+            nameSuffixes: ['%'],
+            nameBase: 'Zig Zag'
+        });
+        SeriesRegistry.registerSeriesType('zigzag', ZigzagIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
         /**
          * A `Zig Zag` series. If the [type](#series.zigzag.type) option is not
          * specified, it is inherited from [chart.type](#chart.type).
@@ -245,9 +271,13 @@
          * @since     6.0.0
          * @product   highstock
          * @excluding dataParser, dataURL
+         * @requires  stock/indicators/indicators
+         * @requires  stock/indicators/zigzag
          * @apioption series.zigzag
          */
+        ''; // adds doclets above to transpiled file
 
+        return ZigzagIndicator;
     });
     _registerModule(_modules, 'masters/indicators/zigzag.src.js', [], function () {
 

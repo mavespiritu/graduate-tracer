@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Pawel Fus, Sebastian Bochan
+ * (c) 2010-2021 Pawel Fus, Sebastian Bochan
  *
  * License: www.highcharts.com/license
  */
@@ -28,128 +28,319 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'mixins/indicator-required.js', [_modules['parts/Globals.js']], function (H) {
-        /**
-         * (c) 2010-2019 Daniel Studencki
-         *
-         * License: www.highcharts.com/license
-         */
-
-
-        var error = H.error;
-
-        var requiredIndicatorMixin = {
-            /**
-             * Check whether given indicator is loaded, else throw error.
-             * @param {function} indicator Indicator constructor function.
-             * @param {string} requiredIndicator required indicator type.
-             * @param {string} type Type of indicator where function was called (parent).
-             * @param {function} callback Callback which is triggered if the given
-             *                            indicator is loaded. Takes indicator as
-             *                            an argument.
-             * @param {string} errMessage Error message that will be logged in console.
-             * @returns {boolean} Returns false when there is no required indicator loaded.
-             */
-            isParentLoaded: function (
-                indicator,
-                requiredIndicator,
-                type,
-                callback,
-                errMessage
-            ) {
-                if (indicator) {
-                    return callback ? callback(indicator) : true;
-                }
-                error(
-                    errMessage || this.generateMessage(type, requiredIndicator)
-                );
-                return false;
-            },
-            generateMessage: function (indicatorType, required) {
-                return 'Error: "' + indicatorType +
-                    '" indicator type requires "' + required +
-                    '" indicator loaded before. Please read docs: ' +
-                    'https://api.highcharts.com/highstock/plotOptions.' +
-                    indicatorType;
-            }
-        };
-
-
-        return requiredIndicatorMixin;
-    });
-    _registerModule(_modules, 'indicators/indicators.src.js', [_modules['parts/Globals.js'], _modules['mixins/indicator-required.js']], function (H, requiredIndicatorMixin) {
+    _registerModule(_modules, 'Stock/Indicators/SMA/SMAComposition.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
         /* *
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
+        var Series = SeriesRegistry.series,
+            ohlcProto = SeriesRegistry.seriesTypes.ohlc.prototype;
+        var addEvent = U.addEvent,
+            extend = U.extend;
 
-
-
-        var pick = H.pick,
-            error = H.error,
-            Series = H.Series,
-            isArray = H.isArray,
-            addEvent = H.addEvent,
-            seriesType = H.seriesType,
-            seriesTypes = H.seriesTypes,
-            ohlcProto = H.seriesTypes.ohlc.prototype,
-            generateMessage = requiredIndicatorMixin.generateMessage;
-
-        /**
-         * The parameter allows setting line series type and use OHLC indicators. Data
-         * in OHLC format is required.
+    });
+    _registerModule(_modules, 'Stock/Indicators/SMA/SMAIndicator.js', [_modules['Core/Chart/Chart.js'], _modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (Chart, SeriesRegistry, U) {
+        /* *
          *
-         * @sample {highstock} stock/indicators/use-ohlc-data
-         *         Plot line on Y axis
+         *  License: www.highcharts.com/license
          *
-         * @type      {boolean}
-         * @product   highstock
-         * @apioption plotOptions.line.useOhlcData
-         */
-
-        addEvent(H.Series, 'init', function (eventOptions) {
-            var series = this,
-                options = eventOptions.options;
-
-            if (
-                options.useOhlcData &&
-                options.id !== 'highcharts-navigator-series'
-            ) {
-                H.extend(series, {
-                    pointValKey: ohlcProto.pointValKey,
-                    keys: ohlcProto.keys,
-                    pointArrayMap: ohlcProto.pointArrayMap,
-                    toYData: ohlcProto.toYData
-                });
-            }
-        });
-
-        addEvent(Series, 'afterSetOptions', function (e) {
-            var options = e.options,
-                dataGrouping = options.dataGrouping;
-
-            if (
-                dataGrouping &&
-                options.useOhlcData &&
-                options.id !== 'highcharts-navigator-series'
-            ) {
-                dataGrouping.approximation = 'ohlc';
-            }
-        });
-
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
+         * */
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var LineSeries = SeriesRegistry.seriesTypes.line;
+        var addEvent = U.addEvent,
+            error = U.error,
+            extend = U.extend,
+            isArray = U.isArray,
+            merge = U.merge,
+            pick = U.pick,
+            splat = U.splat;
+        /* *
+         *
+         *  Class
+         *
+         * */
         /**
          * The SMA series type.
          *
          * @private
-         * @class
-         * @name Highcharts.seriesTypes.sma
-         *
-         * @augments Highcharts.Series
          */
-        seriesType(
-            'sma',
-            'line',
+        var SMAIndicator = /** @class */ (function (_super) {
+                __extends(SMAIndicator, _super);
+            function SMAIndicator() {
+                /* *
+                 *
+                 *  Static Properties
+                 *
+                 * */
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                /* *
+                 *
+                 *  Properties
+                 *
+                 * */
+                _this.data = void 0;
+                _this.dataEventsToUnbind = void 0;
+                _this.linkedParent = void 0;
+                _this.options = void 0;
+                _this.points = void 0;
+                return _this;
+                /* eslint-enable valid-jsdoc */
+            }
+            /* *
+             *
+             *  Functions
+             *
+             * */
+            /* eslint-disable valid-jsdoc */
+            /**
+             * @private
+             */
+            SMAIndicator.prototype.destroy = function () {
+                this.dataEventsToUnbind.forEach(function (unbinder) {
+                    unbinder();
+                });
+                _super.prototype.destroy.apply(this, arguments);
+            };
+            /**
+             * @private
+             */
+            SMAIndicator.prototype.getName = function () {
+                var name = this.name,
+                    params = [];
+                if (!name) {
+                    (this.nameComponents || []).forEach(function (component, index) {
+                        params.push(this.options.params[component] +
+                            pick(this.nameSuffixes[index], ''));
+                    }, this);
+                    name = (this.nameBase || this.type.toUpperCase()) +
+                        (this.nameComponents ? ' (' + params.join(', ') + ')' : '');
+                }
+                return name;
+            };
+            /**
+             * @private
+             */
+            SMAIndicator.prototype.getValues = function (series, params) {
+                var period = params.period,
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal.length,
+                    range = 0,
+                    sum = 0,
+                    SMA = [],
+                    xData = [],
+                    yData = [],
+                    index = -1,
+                    i,
+                    SMAPoint;
+                if (xVal.length < period) {
+                    return;
+                }
+                // Switch index for OHLC / Candlestick / Arearange
+                if (isArray(yVal[0])) {
+                    index = params.index ? params.index : 0;
+                }
+                // Accumulate first N-points
+                while (range < period - 1) {
+                    sum += index < 0 ? yVal[range] : yVal[range][index];
+                    range++;
+                }
+                // Calculate value one-by-one for each period in visible data
+                for (i = range; i < yValLen; i++) {
+                    sum += index < 0 ? yVal[i] : yVal[i][index];
+                    SMAPoint = [xVal[i], sum / period];
+                    SMA.push(SMAPoint);
+                    xData.push(SMAPoint[0]);
+                    yData.push(SMAPoint[1]);
+                    sum -= (index < 0 ?
+                        yVal[i - range] :
+                        yVal[i - range][index]);
+                }
+                return {
+                    values: SMA,
+                    xData: xData,
+                    yData: yData
+                };
+            };
+            /**
+             * @private
+             */
+            SMAIndicator.prototype.init = function (chart, options) {
+                var indicator = this;
+                _super.prototype.init.call(indicator, chart, options);
+                // Only after series are linked indicator can be processed.
+                var linkedSeriesUnbiner = addEvent(Chart, 'afterLinkSeries',
+                    function () {
+                        var hasEvents = !!indicator.dataEventsToUnbind.length;
+                    if (indicator.linkedParent) {
+                        if (!hasEvents) {
+                            // No matter which indicator, always recalculate after
+                            // updating the data.
+                            indicator.dataEventsToUnbind.push(addEvent(indicator.linkedParent, 'updatedData', function () {
+                                indicator.recalculateValues();
+                            }));
+                            // Some indicators (like VBP) requires an additional
+                            // event (afterSetExtremes) to properly show the data.
+                            if (indicator.calculateOn.xAxis) {
+                                indicator.dataEventsToUnbind.push(addEvent(indicator.linkedParent.xAxis, indicator.calculateOn.xAxis, function () {
+                                    indicator.recalculateValues();
+                                }));
+                            }
+                        }
+                        // Most indicators are being calculated on chart's init.
+                        if (indicator.calculateOn.chart === 'init') {
+                            if (!indicator.processedYData) {
+                                indicator.recalculateValues();
+                            }
+                        }
+                        else if (!hasEvents) {
+                            // Some indicators (like VBP) has to recalculate their
+                            // values after other chart's events (render).
+                            var unbinder_1 = addEvent(indicator.chart,
+                                indicator.calculateOn.chart,
+                                function () {
+                                    indicator.recalculateValues();
+                                // Call this just once.
+                                unbinder_1();
+                            });
+                        }
+                    }
+                    else {
+                        return error('Series ' +
+                            indicator.options.linkedTo +
+                            ' not found! Check `linkedTo`.', false, chart);
+                    }
+                }, {
+                    order: 0
+                });
+                // Make sure we find series which is a base for an indicator
+                // chart.linkSeries();
+                indicator.dataEventsToUnbind = [];
+                indicator.eventsToUnbind.push(linkedSeriesUnbiner);
+            };
+            /**
+             * @private
+             */
+            SMAIndicator.prototype.recalculateValues = function () {
+                var indicator = this,
+                    oldData = indicator.points || [],
+                    oldDataLength = (indicator.xData || []).length,
+                    processedData = (indicator.getValues(indicator.linkedParent,
+                    indicator.options.params) || {
+                        values: [],
+                        xData: [],
+                        yData: []
+                    }),
+                    croppedDataValues = [],
+                    overwriteData = true,
+                    oldFirstPointIndex,
+                    oldLastPointIndex,
+                    croppedData,
+                    min,
+                    max,
+                    i;
+                // We need to update points to reflect changes in all,
+                // x and y's, values. However, do it only for non-grouped
+                // data - grouping does it for us (#8572)
+                if (oldDataLength &&
+                    !indicator.hasGroupedData &&
+                    indicator.visible &&
+                    indicator.points) {
+                    // When data is cropped update only avaliable points (#9493)
+                    if (indicator.cropped) {
+                        if (indicator.xAxis) {
+                            min = indicator.xAxis.min;
+                            max = indicator.xAxis.max;
+                        }
+                        croppedData = indicator.cropData(processedData.xData, processedData.yData, min, max);
+                        for (i = 0; i < croppedData.xData.length; i++) {
+                            // (#10774)
+                            croppedDataValues.push([
+                                croppedData.xData[i]
+                            ].concat(splat(croppedData.yData[i])));
+                        }
+                        oldFirstPointIndex = processedData.xData.indexOf(indicator.xData[0]);
+                        oldLastPointIndex = processedData.xData.indexOf(indicator.xData[indicator.xData.length - 1]);
+                        // Check if indicator points should be shifted (#8572)
+                        if (oldFirstPointIndex === -1 &&
+                            oldLastPointIndex === processedData.xData.length - 2) {
+                            if (croppedDataValues[0][0] === oldData[0].x) {
+                                croppedDataValues.shift();
+                            }
+                        }
+                        indicator.updateData(croppedDataValues);
+                        // Omit addPoint() and removePoint() cases
+                    }
+                    else if (processedData.xData.length !== oldDataLength - 1 &&
+                        processedData.xData.length !== oldDataLength + 1) {
+                        overwriteData = false;
+                        indicator.updateData(processedData.values);
+                    }
+                }
+                if (overwriteData) {
+                    indicator.xData = processedData.xData;
+                    indicator.yData = processedData.yData;
+                    indicator.options.data = processedData.values;
+                }
+                // Removal of processedXData property is required because on
+                // first translate processedXData array is empty
+                if (indicator.calculateOn.xAxis && indicator.processedXData) {
+                    delete indicator.processedXData;
+                    indicator.isDirty = true;
+                    indicator.redraw();
+                }
+                indicator.isDirtyData = false;
+            };
+            /**
+             * @private
+             */
+            SMAIndicator.prototype.processData = function () {
+                var series = this,
+                    compareToMain = series.options.compareToMain,
+                    linkedParent = series.linkedParent;
+                _super.prototype.processData.apply(series, arguments);
+                if (series.dataModify &&
+                    linkedParent &&
+                    linkedParent.dataModify &&
+                    linkedParent.dataModify.compareValue &&
+                    compareToMain) {
+                    series.dataModify.compareValue =
+                        linkedParent.dataModify.compareValue;
+                }
+                return;
+            };
+            /**
+             * The parameter allows setting line series type and use OHLC indicators.
+             * Data in OHLC format is required.
+             *
+             * @sample {highstock} stock/indicators/use-ohlc-data
+             *         Use OHLC data format to plot line chart
+             *
+             * @type      {boolean}
+             * @product   highstock
+             * @apioption plotOptions.line.useOhlcData
+             */
             /**
              * Simple moving average indicator (SMA). This series requires `linkedTo`
              * option to be set.
@@ -159,14 +350,15 @@
              *
              * @extends      plotOptions.line
              * @since        6.0.0
-             * @excluding    allAreas, colorAxis, joinBy, keys, navigatorOptions,
-             *               pointInterval, pointIntervalUnit, pointPlacement,
-             *               pointRange, pointStart, showInNavigator, stacking,
-             *               useOhlcData
+             * @excluding    allAreas, colorAxis, dragDrop, joinBy, keys,
+             *               navigatorOptions, pointInterval, pointIntervalUnit,
+             *               pointPlacement, pointRange, pointStart, showInNavigator,
+             *               stacking, useOhlcData
              * @product      highstock
+             * @requires     stock/indicators/indicators
              * @optionparent plotOptions.sma
              */
-            {
+            SMAIndicator.defaultOptions = merge(LineSeries.defaultOptions, {
                 /**
                  * The name of the series as shown in the legend, tooltip etc. If not
                  * set, it will be based on a technical indicator type and default
@@ -174,7 +366,7 @@
                  *
                  * @type {string}
                  */
-                name: undefined,
+                name: void 0,
                 tooltip: {
                     /**
                      * Number of decimals in indicator series.
@@ -187,7 +379,7 @@
                  *
                  * @type {string}
                  */
-                linkedTo: undefined,
+                linkedTo: void 0,
                 /**
                  * Whether to compare indicator to the main series values
                  * or indicator values.
@@ -208,7 +400,7 @@
                      * example using OHLC data, index=2 means the indicator will be
                      * calculated using Low values.
                      */
-                    index: 0,
+                    index: 3,
                     /**
                      * The base period for indicator calculations. This is the number of
                      * data points which are taken into account for the indicator
@@ -216,283 +408,29 @@
                      */
                     period: 14
                 }
+            });
+            return SMAIndicator;
+        }(LineSeries));
+        extend(SMAIndicator.prototype, {
+            calculateOn: {
+                chart: 'init'
             },
-            /**
-             * @lends Highcharts.Series.prototype
-             */
-            {
-                processData: function () {
-                    var series = this,
-                        compareToMain = series.options.compareToMain,
-                        linkedParent = series.linkedParent;
-
-                    Series.prototype.processData.apply(series, arguments);
-
-                    if (linkedParent && linkedParent.compareValue && compareToMain) {
-                        series.compareValue = linkedParent.compareValue;
-                    }
-                },
-                bindTo: {
-                    series: true,
-                    eventName: 'updatedData'
-                },
-                hasDerivedData: true,
-                useCommonDataGrouping: true,
-                nameComponents: ['period'],
-                nameSuffixes: [], // e.g. Zig Zag uses extra '%'' in the legend name
-                calculateOn: 'init',
-                // Defines on which other indicators is this indicator based on.
-                requiredIndicators: [],
-                requireIndicators: function () {
-                    var obj = {
-                        allLoaded: true
-                    };
-
-                    // Check whether all required indicators are loaded, else return
-                    // the object with missing indicator's name.
-                    this.requiredIndicators.forEach(function (indicator) {
-                        if (seriesTypes[indicator]) {
-                            seriesTypes[indicator].prototype.requireIndicators();
-                        } else {
-                            obj.allLoaded = false;
-                            obj.needed = indicator;
-                        }
-                    });
-                    return obj;
-                },
-                init: function (chart, options) {
-                    var indicator = this,
-                        requiredIndicators = indicator.requireIndicators();
-
-                    // Check whether all required indicators are loaded.
-                    if (!requiredIndicators.allLoaded) {
-                        return error(
-                            generateMessage(indicator.type, requiredIndicators.needed)
-                        );
-                    }
-
-                    Series.prototype.init.call(
-                        indicator,
-                        chart,
-                        options
-                    );
-
-                    // Make sure we find series which is a base for an indicator
-                    chart.linkSeries();
-
-                    indicator.dataEventsToUnbind = [];
-
-                    function recalculateValues() {
-                        var oldData = indicator.points || [],
-                            oldDataLength = (indicator.xData || []).length,
-                            processedData = indicator.getValues(
-                                indicator.linkedParent,
-                                indicator.options.params
-                            ) || {
-                                values: [],
-                                xData: [],
-                                yData: []
-                            },
-                            croppedDataValues = [],
-                            overwriteData = true,
-                            oldFirstPointIndex,
-                            oldLastPointIndex,
-                            croppedData,
-                            min,
-                            max,
-                            i;
-
-                        // We need to update points to reflect changes in all,
-                        // x and y's, values. However, do it only for non-grouped
-                        // data - grouping does it for us (#8572)
-                        if (
-                            oldDataLength &&
-                            !indicator.hasGroupedData &&
-                            indicator.visible &&
-                            indicator.points
-                        ) {
-                            // When data is cropped update only avaliable points (#9493)
-                            if (indicator.cropped) {
-                                if (indicator.xAxis) {
-                                    min = indicator.xAxis.min;
-                                    max = indicator.xAxis.max;
-                                }
-
-                                croppedData = indicator.cropData(
-                                    processedData.xData,
-                                    processedData.yData,
-                                    min,
-                                    max
-                                );
-
-                                for (i = 0; i < croppedData.xData.length; i++) {
-                                    // (#10774)
-                                    croppedDataValues.push([
-                                        croppedData.xData[i]
-                                    ].concat(
-                                        H.splat(croppedData.yData[i])
-                                    ));
-                                }
-
-                                oldFirstPointIndex = processedData.xData.indexOf(
-                                    indicator.xData[0]
-                                );
-                                oldLastPointIndex = processedData.xData.indexOf(
-                                    indicator.xData[indicator.xData.length - 1]
-                                );
-
-                                // Check if indicator points should be shifted (#8572)
-                                if (
-                                    oldFirstPointIndex === -1 &&
-                                    oldLastPointIndex === processedData.xData.length - 2
-                                ) {
-                                    if (croppedDataValues[0][0] === oldData[0].x) {
-                                        croppedDataValues.shift();
-                                    }
-                                }
-
-                                indicator.updateData(croppedDataValues);
-
-                            // Omit addPoint() and removePoint() cases
-                            } else if (
-                                processedData.xData.length !== oldDataLength - 1 &&
-                                processedData.xData.length !== oldDataLength + 1
-                            ) {
-                                overwriteData = false;
-                                indicator.updateData(processedData.values);
-                            }
-                        }
-
-                        if (overwriteData) {
-                            indicator.xData = processedData.xData;
-                            indicator.yData = processedData.yData;
-                            indicator.options.data = processedData.values;
-                        }
-
-                        // Removal of processedXData property is required because on
-                        // first translate processedXData array is empty
-                        if (indicator.bindTo.series === false) {
-                            delete indicator.processedXData;
-
-                            indicator.isDirty = true;
-                            indicator.redraw();
-                        }
-                        indicator.isDirtyData = false;
-                    }
-
-                    if (!indicator.linkedParent) {
-                        return error(
-                            'Series ' +
-                            indicator.options.linkedTo +
-                            ' not found! Check `linkedTo`.',
-                            false,
-                            chart
-                        );
-                    }
-
-                    indicator.dataEventsToUnbind.push(
-                        addEvent(
-                            indicator.bindTo.series ?
-                                indicator.linkedParent : indicator.linkedParent.xAxis,
-                            indicator.bindTo.eventName,
-                            recalculateValues
-                        )
-                    );
-
-                    if (indicator.calculateOn === 'init') {
-                        recalculateValues();
-                    } else {
-                        var unbinder = addEvent(
-                            indicator.chart,
-                            indicator.calculateOn,
-                            function () {
-                                recalculateValues();
-                                // Call this just once, on init
-                                unbinder();
-                            }
-                        );
-                    }
-
-                    return indicator;
-                },
-                getName: function () {
-                    var name = this.name,
-                        params = [];
-
-                    if (!name) {
-
-                        (this.nameComponents || []).forEach(
-                            function (component, index) {
-                                params.push(
-                                    this.options.params[component] +
-                                    pick(this.nameSuffixes[index], '')
-                                );
-                            },
-                            this
-                        );
-
-                        name = (this.nameBase || this.type.toUpperCase()) +
-                            (this.nameComponents ? ' (' + params.join(', ') + ')' : '');
-                    }
-
-                    return name;
-                },
-                getValues: function (series, params) {
-                    var period = params.period,
-                        xVal = series.xData,
-                        yVal = series.yData,
-                        yValLen = yVal.length,
-                        range = 0,
-                        sum = 0,
-                        SMA = [],
-                        xData = [],
-                        yData = [],
-                        index = -1,
-                        i,
-                        SMAPoint;
-
-                    if (xVal.length < period) {
-                        return false;
-                    }
-
-                    // Switch index for OHLC / Candlestick / Arearange
-                    if (isArray(yVal[0])) {
-                        index = params.index ? params.index : 0;
-                    }
-
-                    // Accumulate first N-points
-                    while (range < period - 1) {
-                        sum += index < 0 ? yVal[range] : yVal[range][index];
-                        range++;
-                    }
-
-                    // Calculate value one-by-one for each period in visible data
-                    for (i = range; i < yValLen; i++) {
-                        sum += index < 0 ? yVal[i] : yVal[i][index];
-
-                        SMAPoint = [xVal[i], sum / period];
-                        SMA.push(SMAPoint);
-                        xData.push(SMAPoint[0]);
-                        yData.push(SMAPoint[1]);
-
-                        sum -= index < 0 ? yVal[i - range] : yVal[i - range][index];
-                    }
-
-                    return {
-                        values: SMA,
-                        xData: xData,
-                        yData: yData
-                    };
-                },
-                destroy: function () {
-                    this.dataEventsToUnbind.forEach(function (unbinder) {
-                        unbinder();
-                    });
-                    Series.prototype.destroy.call(this);
-                }
-            }
-        );
-
+            hasDerivedData: true,
+            nameComponents: ['period'],
+            nameSuffixes: [],
+            useCommonDataGrouping: true
+        });
+        SeriesRegistry.registerSeriesType('sma', SMAIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
+        /* *
+         *
+         *  API Options
+         *
+         * */
         /**
          * A `SMA` series. If the [type](#series.sma.type) option is not specified, it
          * is inherited from [chart.type](#chart.type).
@@ -501,9 +439,189 @@
          * @since     6.0.0
          * @product   highstock
          * @excluding dataParser, dataURL, useOhlcData
+         * @requires  stock/indicators/indicators
          * @apioption series.sma
          */
+        ''; // adds doclet above to the transpiled file
 
+        return SMAIndicator;
+    });
+    _registerModule(_modules, 'Stock/Indicators/EMA/EMAIndicator.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
+        /* *
+         *
+         *  License: www.highcharts.com/license
+         *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
+         * */
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var correctFloat = U.correctFloat,
+            isArray = U.isArray,
+            merge = U.merge;
+        /* *
+         *
+         *  Class
+         *
+         * */
+        /**
+         * The EMA series type.
+         *
+         * @private
+         * @class
+         * @name Highcharts.seriesTypes.ema
+         *
+         * @augments Highcharts.Series
+         */
+        var EMAIndicator = /** @class */ (function (_super) {
+                __extends(EMAIndicator, _super);
+            function EMAIndicator() {
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                /* *
+                 *
+                 *  Properties
+                 *
+                 * */
+                _this.data = void 0;
+                _this.options = void 0;
+                _this.points = void 0;
+                return _this;
+            }
+            /* *
+             *
+             *  Functions
+             *
+             * */
+            EMAIndicator.prototype.accumulatePeriodPoints = function (period, index, yVal) {
+                var sum = 0,
+                    i = 0,
+                    y = 0;
+                while (i < period) {
+                    y = index < 0 ? yVal[i] : yVal[i][index];
+                    sum = sum + y;
+                    i++;
+                }
+                return sum;
+            };
+            EMAIndicator.prototype.calculateEma = function (xVal, yVal, i, EMApercent, calEMA, index, SMA) {
+                var x = xVal[i - 1],
+                    yValue = index < 0 ?
+                        yVal[i - 1] :
+                        yVal[i - 1][index],
+                    y;
+                y = typeof calEMA === 'undefined' ?
+                    SMA : correctFloat((yValue * EMApercent) +
+                    (calEMA * (1 - EMApercent)));
+                return [x, y];
+            };
+            EMAIndicator.prototype.getValues = function (series, params) {
+                var period = params.period,
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal ? yVal.length : 0,
+                    EMApercent = 2 / (period + 1),
+                    sum = 0,
+                    EMA = [],
+                    xData = [],
+                    yData = [],
+                    index = -1,
+                    SMA = 0,
+                    calEMA,
+                    EMAPoint,
+                    i;
+                // Check period, if bigger than points length, skip
+                if (yValLen < period) {
+                    return;
+                }
+                // Switch index for OHLC / Candlestick / Arearange
+                if (isArray(yVal[0])) {
+                    index = params.index ? params.index : 0;
+                }
+                // Accumulate first N-points
+                sum = this.accumulatePeriodPoints(period, index, yVal);
+                // first point
+                SMA = sum / period;
+                // Calculate value one-by-one for each period in visible data
+                for (i = period; i < yValLen + 1; i++) {
+                    EMAPoint = this.calculateEma(xVal, yVal, i, EMApercent, calEMA, index, SMA);
+                    EMA.push(EMAPoint);
+                    xData.push(EMAPoint[0]);
+                    yData.push(EMAPoint[1]);
+                    calEMA = EMAPoint[1];
+                }
+                return {
+                    values: EMA,
+                    xData: xData,
+                    yData: yData
+                };
+            };
+            /**
+             * Exponential moving average indicator (EMA). This series requires the
+             * `linkedTo` option to be set.
+             *
+             * @sample stock/indicators/ema
+             * Exponential moving average indicator
+             *
+             * @extends      plotOptions.sma
+             * @since        6.0.0
+             * @product      highstock
+             * @requires     stock/indicators/indicators
+             * @optionparent plotOptions.ema
+             */
+            EMAIndicator.defaultOptions = merge(SMAIndicator.defaultOptions, {
+                params: {
+                    /**
+                     * The point index which indicator calculations will base. For
+                     * example using OHLC data, index=2 means the indicator will be
+                     * calculated using Low values.
+                     *
+                     * By default index value used to be set to 0. Since
+                     * Highcharts Stock 7 by default index is set to 3
+                     * which means that the ema indicator will be
+                     * calculated using Close values.
+                     */
+                    index: 3,
+                    period: 9 // @merge 14 in v6.2
+                }
+            });
+            return EMAIndicator;
+        }(SMAIndicator));
+        SeriesRegistry.registerSeriesType('ema', EMAIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
+        /**
+         * A `EMA` series. If the [type](#series.ema.type) option is not
+         * specified, it is inherited from [chart.type](#chart.type).
+         *
+         * @extends   series,plotOptions.ema
+         * @since     6.0.0
+         * @product   highstock
+         * @excluding dataParser, dataURL
+         * @requires  stock/indicators/indicators
+         * @apioption series.ema
+         */
+        ''; // adds doclet above to the transpiled file
+
+        return EMAIndicator;
     });
     _registerModule(_modules, 'masters/indicators/indicators.src.js', [], function () {
 

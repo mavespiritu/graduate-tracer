@@ -55,17 +55,28 @@ class UserInfo extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getAnswers()
+    public function getAnswers($stage_id)
     {
-        return $this->hasMany(Answer::className(), ['user_id' => 'user_id']);
+        $answers = Answer::find()->where(['user_id' => Yii::$app->user->id, 'stage_id' => $stage_id])->leftJoin('question', 'question.id = answer.question_id')->all();
+
+        return $answers;
     }
 
-    public function getCurrentQuestion()
+    public function getCurrentQuestion($stage_id)
+    {
+        $answer = Answer::find()->where(['user_id' => Yii::$app->user->id, 'stage_id' => $stage_id])->leftJoin('question', 'question.id = answer.question_id')->orderBy(['id' => SORT_DESC])->one();
+
+        $question = $answer ? !is_null($answer->next_question_id) ? Question::find()->where(['id' => $answer->next_question_id])->one() : null : Question::find()->where(['stage_id' => $stage_id])->orderBy(['id' => SORT_ASC])->one();
+
+        return $question;
+    }
+
+    public function getCurrentStage()
     {
         $answer = Answer::find()->where(['user_id' => Yii::$app->user->id])->orderBy(['id' => SORT_DESC])->one();
 
-        $question = $answer ? Question::find()->where(['id' => $answer->next_question_id])->one() : Question::find()->where(['id' => 1])->one();
+        $completion = $answer ? Completion::findOne(['user_id' => Yii::$app->user->id, 'stage_id' => $answer->question->stage->id]) ? Completion::findOne(['user_id' => Yii::$app->user->id, 'stage_id' => $answer->question->stage->id]) : null : null;
 
-        return $question;
+        return $answer ? !is_null($completion) ? $answer->question->stage->id + 1 : $answer->question->stage->id : 1;
     }
 }

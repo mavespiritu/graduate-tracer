@@ -15,7 +15,6 @@ use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\Pjax;
 use kartik\select2\Select2;
-use yii\web\View;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -33,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <?= $this->render('/admin/_menu') ?>
 
 <?php Pjax::begin() ?>
-
+<div style="min-width: 100%; overflow: auto;">
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel'  => $searchModel,
@@ -57,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]),
             'visible' => true,
         ],
-        [
+        /* [
             'label'=>'Major',
             'attribute'=>'major_id',
             'value'=> function ($model){
@@ -74,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                         ]),
             'visible' => true,
-        ],
+        ], */
         'fullName',
         'username',
         'email:email',
@@ -172,5 +171,5 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ],
 ]); ?>
-
+</div>
 <?php Pjax::end() ?>

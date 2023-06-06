@@ -1,14 +1,14 @@
 /**
- * @license  @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  * @module highcharts/indicators/aroon-oscillator
  * @requires highcharts
  * @requires highcharts/modules/stock
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Wojciech Chmiel
+ * (c) 2010-2021 Wojciech Chmiel
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../indicators/aroon-oscillator.src.js';
+import '../../Stock/Indicators/AroonOscillator/AroonOscillatorIndicator.js';

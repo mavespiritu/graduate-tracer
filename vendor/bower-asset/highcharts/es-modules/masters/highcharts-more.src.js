@@ -1,24 +1,28 @@
 /**
- * @license @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts JS v9.3.3 (2022-02-01)
  * @module highcharts/highcharts-more
  * @requires highcharts
  *
- * (c) 2009-2018 Torstein Honsi
+ * (c) 2009-2021 Torstein Honsi
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../parts-more/Pane.js';
-import '../parts-more/RadialAxis.js';
-import '../parts-more/AreaRangeSeries.js';
-import '../parts-more/AreaSplineRangeSeries.js';
-import '../parts-more/ColumnRangeSeries.js';
-import '../parts-more/ColumnPyramidSeries.js';
-import '../parts-more/GaugeSeries.js';
-import '../parts-more/BoxPlotSeries.js';
-import '../parts-more/ErrorBarSeries.js';
-import '../parts-more/WaterfallSeries.js';
-import '../parts-more/PolygonSeries.js';
-import '../parts-more/BubbleSeries.js';
-import '../parts-more/PackedBubbleSeries.js';
-import '../parts-more/Polar.js';
+import Highcharts from '../Core/Globals.js';
+var G = Highcharts;
+import '../Extensions/Pane.js';
+import RadialAxis from '../Core/Axis/RadialAxis.js';
+RadialAxis.compose(G.Axis, G.Tick);
+import '../Series/AreaRange/AreaRangeSeries.js';
+import '../Series/AreaSplineRange/AreaSplineRangeSeries.js';
+import '../Series/BoxPlot/BoxPlotSeries.js';
+import BubbleSeries from '../Series/Bubble/BubbleSeries.js';
+BubbleSeries.compose(G.Chart, G.Legend, G.Series);
+import '../Series/ColumnRange/ColumnRangeSeries.js';
+import '../Series/ColumnPyramid/ColumnPyramidSeries.js';
+import '../Series/ErrorBar/ErrorBarSeries.js';
+import '../Series/Gauge/GaugeSeries.js';
+import '../Series/PackedBubble/PackedBubbleSeries.js';
+import '../Series/Polygon/PolygonSeries.js';
+import '../Series/Waterfall/WaterfallSeries.js';
+import '../Extensions/Polar.js';

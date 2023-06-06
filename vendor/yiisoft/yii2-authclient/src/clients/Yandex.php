@@ -1,8 +1,8 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 namespace yii\authclient\clients;
@@ -25,6 +25,14 @@ use yii\authclient\OAuth2;
  *                 'class' => 'yii\authclient\clients\Yandex',
  *                 'clientId' => 'yandex_client_id',
  *                 'clientSecret' => 'yandex_client_secret',
+ *                 'normalizeUserAttributeMap' => [
+ *                      'email' => function ($attributes) {
+ *                          return $attributes['email']
+ *                              ?? $attributes['default_email']
+ *                              ?? current($attributes['emails'] ?? [])
+ *                              ?: null;
+ *                      }
+ *                  ]
  *             ],
  *         ],
  *     ]

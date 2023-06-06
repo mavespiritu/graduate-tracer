@@ -15,7 +15,7 @@ use yii\helpers\FileHelper;
  *
  * @property string $fullUrl Full target URL.
  * @property string $method Request method.
- * @property array $options Request options. This property is read-only.
+ * @property-read array $options Request options. This property is read-only.
  * @property string|array $url Target URL or URL parameters.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
@@ -61,6 +61,14 @@ class Request extends Message
      * @var array Stores map (alias => name) of the content parameters
      */
     private $_contentMap = [];
+    /**
+     * @var float stores the starttime of the current request with microsecond-precession
+     */
+    private $_startTime;
+    /**
+     * @var float stores the seconds of how long does it take to get a response
+     */
+    private $_timeElapsed;
 
 
     /**
@@ -375,7 +383,8 @@ class Request extends Message
 
         // generate safe boundary :
         do {
-            $boundary = '---------------------' . md5(mt_rand() . microtime());
+
+            $boundary = '---------------------' . md5(random_int(0, PHP_INT_MAX) . microtime());
         } while (preg_grep("/{$boundary}/", $contentParts));
 
         // add boundary for each part :
@@ -448,6 +457,7 @@ class Request extends Message
         $event = new RequestEvent();
         $event->request = $this;
         $this->trigger(self::EVENT_BEFORE_SEND, $event);
+        $this->_startTime = microtime(true);
     }
 
     /**
@@ -458,12 +468,24 @@ class Request extends Message
      */
     public function afterSend($response)
     {
+        $this->_timeElapsed = microtime(true)-$this->_startTime;
         $this->client->afterSend($this, $response);
 
         $event = new RequestEvent();
         $event->request = $this;
         $event->response = $response;
         $this->trigger(self::EVENT_AFTER_SEND, $event);
+    }
+
+    /**
+     * Return the response time in seconds
+     *
+     * @return float the seconds elapsed from request to response
+     * @since 2.0.12
+     */
+    public function responseTime()
+    {
+        return $this->_timeElapsed;
     }
 
     /**

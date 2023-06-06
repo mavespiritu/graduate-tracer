@@ -22,54 +22,113 @@ $this->params['breadcrumbs'][] = $this->title;
     <br>
     <div class="row">
         <div class="col-md-8 col-xs-12">
-            <img src="https://semantic-ui.com/images/avatar2/large/matthew.png" class="ui middle aligned tiny circular image">
-            <span style="font-size: 35px; padding-left: 3%; font-weight: bolder;"><?= Yii::$app->user->identity->fullName ?>
-                <br>
-                <span style="font-size: 14px; padding-left: 14%;">
-                    <table style="width: 100%; font-size: 16px;" class="table table-responsive">
-                        <tr>
-                            <th>Alumni ID:</th>
-                            <td><?= str_pad(Yii::$app->user->identity->userinfo->user_id, 8, '0', STR_PAD_LEFT); ?></td>
-                            <th>Course:</th>
-                            <td><?= Yii::$app->user->identity->userinfo->course->name ?></td>
-                        </tr>
-                        <tr>
-                            <th>Batch:</th>
-                            <td><?= Yii::$app->user->identity->userinfo->year_graduated ?></td>
-                            <th>Major:</th>
-                            <td><?= Yii::$app->user->identity->userinfo->major->name ?></td>
-                        </tr>
-                    </table>
+            <div class="ui segment" style="border-radius: 15px;">
+                <img src="https://semantic-ui.com/images/avatar2/large/matthew.png" class="ui middle aligned tiny circular image">
+                <span style="font-size: 35px; padding-left: 3%; font-weight: bolder;"><?= Yii::$app->user->identity->fullName ?>
+                    <br>
+                    <span style="font-size: 14px; padding-left: 14%;">
+                        <table style="width: 100%; font-size: 16px;" class="table table-responsive">
+                            <tr>
+                                <th>Alumni ID:</th>
+                                <td>NLP-<?= str_pad(Yii::$app->user->identity->userinfo->user_id, 8, '0', STR_PAD_LEFT); ?></td>
+                                <th>Course:</th>
+                                <td><?= Yii::$app->user->identity->userinfo->course->name ?></td>
+                            </tr>
+                            <tr>
+                                <th>Batch:</th>
+                                <td><?= Yii::$app->user->identity->userinfo->year_graduated ?></td>
+                                <th>Major:</th>
+                                <td><?= !is_null(Yii::$app->user->identity->userinfo->major_id) ? Yii::$app->user->identity->userinfo->major->name : '' ?></td>
+                            </tr>
+                            <tr>
+                                <th colspan=4>Badges Earned:</th>
+                            </tr>
+                            <tr>
+                                <th colspan=4>
+                                    <div id="badge" class="text-center"></div>
+                                </th>
+                            </tr>
+                        </table>
+                    </span>
                 </span>
-            </span>
-            <br>
-            <br>
-            <div id="main-menu">
-                <h2>Welcome to the NLPSC Graduate Tracer!</h2>
-                <p>Good day!  Please complete the gamified survey as accurately & frankly as possible by checking (/) the box corresponding to your response.  Your answer will be used for research purposes in order to assess graduate employability and eventually, improve course offerings to your alma mater & other universities/colleges in the Philippines.  Your answers to this survey will be treated with strictest confidentiality.</p>
-                <button class="ui huge teal button btn-block" id="playButton">Start Now!</button>
             </div>
+            <div id="main-menu"></div>
         </div>
         <div class="col-md-4 col-xs-12">
             <div class="ui segment" style="border-radius: 15px;">
-                <h3>Progress</h3>
-            </div>
-            <div class="ui segment" style="border-radius: 15px;">
                 <h3>Leaderboards</h3>
-                <p class="text-center"><img src="<?= $asset->baseUrl ?>/images/leaderboard.svg" style="height: 80%; width: 80%;"/></p>
-                <h3 class="text-center" style="font-weight: bolder;">Unlock leaderboards!</h3>
-                <p class="text-center">Achieve Level 5 to unlock leaderboards.</p>
-            </div>        
+                <div id="leaderboard"></div>
+            </div>      
+            <div id="prize">
+                <?php if($voucherCodeUser){ ?>
+                <div class="ui segment" style="border-radius: 15px;">
+                    <h3>Your Prize</h3>
+                    <p>Here is our simple gratitude for participating in our survey. Please follow instructions on how to claim the prize. Thank you. <br><br>
+                    Merchant: <b><?= $voucherCodeUser->voucherCode->merchant ?></b> <br>
+                    Voucher Code: <b><?= $voucherCodeUser->voucherCode->voucher_code ?></b> <br>
+                    How to claim: <?= $voucherCodeUser->voucherCode->instruction ?>
+                    </p>
+                </div>  
+                <?php } ?>
+            </div>
         </div>
     </div>
 </div>
 
 <?php
 $script = '
-    function playGame()
+    function home()
     {
         $.ajax({
-            url: "'.Url::to(['/site/play']).'",
+            url: "'.Url::to(['/site/home']).'",
+            beforeSend: function(){
+                $("#main-menu").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
+            },
+            success: function (data) { 
+                $("#main-menu").empty();
+                $("#main-menu").hide();
+                $("#main-menu").fadeIn("slow");
+                $("#main-menu").html(data);
+            }
+        });
+    }
+
+    function leaderBoard()
+    {
+        $.ajax({
+            url: "'.Url::to(['/site/leaderboard']).'",
+            beforeSend: function(){
+                $("#leaderboard").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
+            },
+            success: function (data) { 
+                $("#leaderboard").empty();
+                $("#leaderboard").hide();
+                $("#leaderboard").fadeIn("slow");
+                $("#leaderboard").html(data);
+            }
+        });
+    }
+
+    function badge()
+    {
+        $.ajax({
+            url: "'.Url::to(['/site/badge']).'",
+            beforeSend: function(){
+                $("#badge").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
+            },
+            success: function (data) { 
+                $("#badge").empty();
+                $("#badge").hide();
+                $("#badge").fadeIn("slow");
+                $("#badge").html(data);
+            }
+        });
+    }
+
+    function exitGame()
+    {
+        $.ajax({
+            url: "'.Url::to(['/site/home']).'",
             beforeSend: function(){
                 $("#main-menu").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
             },
@@ -83,8 +142,12 @@ $script = '
     }
 
     $(document).ready(function() {
-        $("#playButton").click(function(e) {
-          playGame();
+        home();
+        badge();
+        leaderBoard();
+
+        $("#exitButton").click(function(e) {
+            exitGame();
         });
     });
 ';

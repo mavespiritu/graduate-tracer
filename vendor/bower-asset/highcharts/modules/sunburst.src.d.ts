@@ -13,14 +13,9 @@ import * as _Highcharts from "../highcharts.src";
  */
 export function factory(highcharts: typeof Highcharts): void;
 declare module "../highcharts.src" {
-    /**
-     * An extended version of draw customized for points. It calls additional
-     * methods that is expected when rendering a point.
-     *
-     * @param params
-     *        Parameters
-     */
-    function drawPoint(params: object): void;
+    function eachObject(): void;
+    function isBoolean(): void;
+    function recursive(): void;
 }
 export default factory;
 export let Highcharts: typeof _Highcharts;
