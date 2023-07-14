@@ -16,7 +16,6 @@ use yii\bootstrap\Modal;
 <div class="ui segment" style="border-radius: 15px;">
     <h2>Welcome to the NLPSC Graduate Tracer!</h2>
     <p>Please complete the gamified survey as accurately & frankly as possible.  Your answer will be used for research purposes in order to assess graduate employability and eventually, improve course offerings to your alma mater & other universities/colleges in the Philippines.  Your answers to this survey will be treated with strictest confidentiality.</p>
-    
     <?php if($stages){ ?>
         <?php foreach($stages as $stage){ ?>
             <?php if($stage->id == 1){ ?>
