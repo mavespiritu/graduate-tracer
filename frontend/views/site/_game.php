@@ -480,13 +480,11 @@ use yii\helpers\Url;
         $.ajax({
             url: "'.Url::to(['/site/home']).'",
             beforeSend: function(){
-                $("#main-menu").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
+                $("#gameplay").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
             },
             success: function (data) { 
-                $("#main-menu").empty();
-                $("#main-menu").hide();
-                $("#main-menu").fadeIn("slow");
-                $("#main-menu").html(data);
+                $("#gameplay").empty();
+                $("#gameplay").hide();
             }
         });
     }
@@ -496,13 +494,13 @@ use yii\helpers\Url;
         $.ajax({
             url: "'.Url::to(['/site/play']).'?stage_id=" + stage_id,
             beforeSend: function(){
-                $("#main-menu").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
+                $("#gameplay").html("<div class=\"text-center\" style=\"margin-top: 50px;\"><svg class=\"spinner\" width=\"30px\" height=\"30px\" viewBox=\"0 0 66 66\" xmlns=\"http://www.w3.org/2000/svg\"><circle class=\"path\" fill=\"none\" stroke-width=\"6\" stroke-linecap=\"round\" cx=\"33\" cy=\"33\" r=\"30\"></circle></svg></div>");
             },
             success: function (data) { 
-                $("#main-menu").empty();
-                $("#main-menu").hide();
-                $("#main-menu").fadeIn("slow");
-                $("#main-menu").html(data);
+                $("#gameplay").empty();
+                $("#gameplay").hide();
+                $("#gameplay").fadeIn("slow");
+                $("#gameplay").html(data);
             }
         });
     }

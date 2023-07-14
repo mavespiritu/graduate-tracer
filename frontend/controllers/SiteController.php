@@ -172,6 +172,79 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionFirstPart()
+    {
+        $user = UserInfo::findOne(['user_id' => Yii::$app->user->id]);
+
+        $firstNameQuestion = Question::findOne(['id' => 1]);
+
+        $firstNameModel = Answer::findOne([
+                'user_id' => Yii::$app->user->id, 
+                'question_id' => 1, 
+                'next_question_id' => 2
+                ]) ? 
+                Answer::findOne([
+                    'user_id' => Yii::$app->user->id, 
+                    'question_id' => 1, 
+                    'next_question_id' => 2
+                ]) : new Answer();
+
+        $firstNameModel->user_id = Yii::$app->user->id;
+        $firstNameModel->question_id = 1;
+        $firstNameModel->next_question_id = 2;
+
+        $middleNameQuestion = Question::findOne(['id' => 2]);
+
+        $middleNameModel = Answer::findOne([
+            'user_id' => Yii::$app->user->id, 
+            'question_id' => 2, 
+            'next_question_id' => 3
+            ]) ? 
+            Answer::findOne([
+                'user_id' => Yii::$app->user->id, 
+                'question_id' => 2, 
+                'next_question_id' => 3
+            ]) : new Answer();
+
+        $middleNameModel->user_id = Yii::$app->user->id;
+        $middleNameModel->question_id = 2;
+        $middleNameModel->next_question_id = 3;
+
+        $lastNameQuestion = Question::findOne(['id' => 3]);
+
+        $lastNameModel = Answer::findOne([
+            'user_id' => Yii::$app->user->id, 
+            'question_id' => 3, 
+            'next_question_id' => 4
+            ]) ? 
+            Answer::findOne([
+                'user_id' => Yii::$app->user->id, 
+                'question_id' => 3, 
+                'next_question_id' => 4
+            ]) : new Answer();
+            
+        $lastNameModel->user_id = Yii::$app->user->id;
+        $lastNameModel->question_id = 3;
+        $lastNameModel->next_question_id = 4;
+
+        $addressQuestion = Question::findOne(['id' => 4]);
+
+        $addressModel = Answer::findOne([
+            'user_id' => Yii::$app->user->id, 
+            'question_id' => 4, 
+            'next_question_id' => 5
+            ]) ? 
+            Answer::findOne([
+                'user_id' => Yii::$app->user->id, 
+                'question_id' => 4, 
+                'next_question_id' => 5
+            ]) : new Answer();
+            
+        $addressModel->user_id = Yii::$app->user->id;
+        $addressModel->question_id = 4;
+        $addressModel->next_question_id = 5;
+    }
+
     public function actionPlay($stage_id)
     {
         $user = UserInfo::findOne(['user_id' => Yii::$app->user->id]);

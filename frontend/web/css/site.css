@@ -46,6 +46,10 @@ input{
     padding: 0 0 60px;
 }
 
+.container {
+  width: 95% !important;
+}
+
 /*.wrap > nav{
     background-color: #71c5ea;
 }*/

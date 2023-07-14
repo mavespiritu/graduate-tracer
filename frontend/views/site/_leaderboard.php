@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 <?php }else{ ?>
-    <p class="text-center"><img src="<?= $asset->baseUrl ?>/images/leaderboard.svg" style="height: 80%; width: 80%;"/></p>
+    <p class="text-center"><img src="<?= $asset->baseUrl ?>/images/leaderboard.svg" style="height: 60%; width: 60%;"/></p>
     <h3 class="text-center" style="font-weight: bolder;">Unlock leaderboards!</h3>
     <p class="text-center">Achieve Part 4 questionnaire to unlock leaderboards.</p>
 <?php } ?>

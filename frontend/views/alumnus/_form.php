@@ -70,6 +70,7 @@ $majorsUrl = \yii\helpers\Url::to(['/alumnus/major-list']);
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Close', ['/alumnus'], ['class' => 'btn btn-default'])?>
     </div>
 
     <?php ActiveForm::end(); ?>

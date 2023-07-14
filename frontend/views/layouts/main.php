@@ -78,10 +78,7 @@ frontend\assets\AppAsset::register($this);
     ?>
     <?php } ?>
     <div class="<?= Yii::$app->user->isGuest ? '' : 'container animated bounceInDown' ?>">
-        <br>
-        <br>
-        <br>
-        <?= $content ?>
+    <?= $content ?>
     </div>
 </div>
 

@@ -40,25 +40,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <th>Major:</th>
                                 <td><?= !is_null(Yii::$app->user->identity->userinfo->major_id) ? Yii::$app->user->identity->userinfo->major->name : '' ?></td>
                             </tr>
-                            <tr>
-                                <th colspan=4>Badges Earned:</th>
-                            </tr>
-                            <tr>
-                                <th colspan=4>
-                                    <div id="badge" class="text-center"></div>
-                                </th>
-                            </tr>
                         </table>
                     </span>
                 </span>
             </div>
             <div id="main-menu"></div>
+            <div id="gameplay"></div>
         </div>
         <div class="col-md-4 col-xs-12">
-            <div class="ui segment" style="border-radius: 15px;">
-                <h3>Leaderboards</h3>
-                <div id="leaderboard"></div>
-            </div>      
             <div id="prize">
                 <?php if($voucherCodeUser){ ?>
                 <div class="ui segment" style="border-radius: 15px;">
@@ -71,6 +60,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>  
                 <?php } ?>
             </div>
+            <div class="ui segment" style="border-radius: 15px;">
+                <h3>Leaderboards</h3>
+                <div id="leaderboard"></div>
+            </div>  
+            <div class="ui segment" style="border-radius: 15px;">
+                <h3>Badges Earned</h3>
+                <div id="badge" class="text-center"></div>
+            </div>      
         </div>
     </div>
 </div>
@@ -155,7 +152,7 @@ $this->registerJs($script);
    
 ?>
 <style>
-    button, input[type=text]{
+    input[type=text]{
         border-radius: 15px !important;
     }
     .stage{

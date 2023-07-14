@@ -24,6 +24,7 @@ use dosamigos\ckeditor\CKEditor;
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Close', ['/voucher-code'], ['class' => 'btn btn-default'])?>
     </div>
 
     <?php ActiveForm::end(); ?>

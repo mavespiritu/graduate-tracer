@@ -17,7 +17,7 @@ $asset = AppAsset::register($this);
 ?>
 <?php if(!empty($badges)){ ?>
     <?php foreach($badges as $badge){ ?>
-        <img src="<?= $asset->baseUrl ?>/images/badges/<?= $badge->badge->title ?>.png" style="height: 12%; width: 12%; margin-right: 10px;" class="badges-earned" onclick="viewBadge(<?= $badge->badge->id ?>)"/>
+        <img src="<?= $asset->baseUrl ?>/images/badges/<?= $badge->badge->title ?>.png" style="height: 20%; width: 20%; margin-right: 10px;" class="badges-earned" onclick="viewBadge(<?= $badge->badge->id ?>)"/>
     <?php } ?>
 <?php } ?>
 <br>

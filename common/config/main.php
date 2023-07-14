@@ -13,7 +13,7 @@ return [
     'modules' => [
         'user' => [
             'class' => 'dektrium\user\Module',
-            'admins' => ['markespiritu'],
+            'admins' => ['administrator'],
             'enableRegistration' => true,
             'enableConfirmation' => true,
             'enableUnconfirmedLogin' => false,
