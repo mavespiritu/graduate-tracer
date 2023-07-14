@@ -139,8 +139,7 @@ class RegistrationController extends Controller
         $courses = Course::find()->orderBy(['name' => SORT_ASC])->all();
         $courses = ArrayHelper::map($courses, 'id', 'name');
 
-        $majors = Major::find()->orderBy(['name' => SORT_ASC])->all();
-        $majors = ArrayHelper::map($majors, 'id', 'name');
+        $majors = [];
 
         if ($model->load(\Yii::$app->request->post()) && $model->register()) {
             $this->trigger(self::EVENT_AFTER_REGISTER, $event);

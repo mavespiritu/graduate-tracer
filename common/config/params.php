@@ -1,8 +1,8 @@
 <?php
 return [
-    'adminEmail' => 'admin@example.com',
-    'supportEmail' => 'support@example.com',
-    'senderEmail' => 'noreply@example.com',
-    'senderName' => 'Example.com mailer',
+    'adminEmail' => 'admin@nlpscgraduatetracer.com',
+    'supportEmail' => 'support@nlpscgraduatetracer.com',
+    'senderEmail' => 'noreply@nlpscgraduatetracer.com',
+    'senderName' => 'NLPSC Graduate Tracer Mailer',
     'user.passwordResetTokenExpire' => 3600,
 ];

@@ -76,5 +76,11 @@ class Question extends \yii\db\ActiveRecord
         return $this->hasMany(Option::className(), ['destination_id' => 'id']);
     }
 
-    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStage()
+    {
+        return $this->hasOne(Stage::className(), ['id' => 'stage_id']);
+    }
 }

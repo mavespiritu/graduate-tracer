@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Sebastian Bochan
+ * (c) 2010-2021 Sebastian Bochan
  *
  * License: www.highcharts.com/license
  */
@@ -28,27 +28,41 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'indicators/momentum.src.js', [_modules['parts/Globals.js']], function (H) {
+    _registerModule(_modules, 'Stock/Indicators/Momentum/MomentumIndicator.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
         /* *
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
-        var isArray = H.isArray,
-            seriesType = H.seriesType;
-
-        function populateAverage(points, xVal, yVal, i, period) {
-            var mmY = yVal[i - 1][3] - yVal[i - period - 1][3],
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var extend = U.extend,
+            isArray = U.isArray,
+            merge = U.merge;
+        /* eslint-disable require-jsdoc */
+        function populateAverage(xVal, yVal, i, period, index) {
+            var mmY = yVal[i - 1][index] - yVal[i - period - 1][index],
                 mmX = xVal[i - 1];
-
-            points.shift(); // remove point until range < period
-
             return [mmX, mmY];
         }
-
+        /* eslint-enable require-jsdoc */
         /**
          * The Momentum series type.
          *
@@ -58,9 +72,55 @@
          *
          * @augments Highcharts.Series
          */
-        seriesType(
-            'momentum',
-            'sma',
+        var MomentumIndicator = /** @class */ (function (_super) {
+                __extends(MomentumIndicator, _super);
+            function MomentumIndicator() {
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                _this.data = void 0;
+                _this.options = void 0;
+                _this.points = void 0;
+                return _this;
+            }
+            MomentumIndicator.prototype.getValues = function (series, params) {
+                var period = params.period,
+                    index = params.index,
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal ? yVal.length : 0,
+                    yValue = yVal[0],
+                    MM = [],
+                    xData = [],
+                    yData = [],
+                    i,
+                    MMPoint;
+                if (xVal.length <= period) {
+                    return;
+                }
+                // Switch index for OHLC / Candlestick / Arearange
+                if (isArray(yVal[0])) {
+                    yValue = yVal[0][index];
+                }
+                else {
+                    return;
+                }
+                // Calculate value one-by-one for each period in visible data
+                for (i = (period + 1); i < yValLen; i++) {
+                    MMPoint = populateAverage(xVal, yVal, i, period, index);
+                    MM.push(MMPoint);
+                    xData.push(MMPoint[0]);
+                    yData.push(MMPoint[1]);
+                }
+                MMPoint = populateAverage(xVal, yVal, i, period, index);
+                MM.push(MMPoint);
+                xData.push(MMPoint[0]);
+                yData.push(MMPoint[1]);
+                return {
+                    values: MM,
+                    xData: xData,
+                    yData: yData
+                };
+            };
             /**
              * Momentum. This series requires `linkedTo` option to be set.
              *
@@ -70,71 +130,26 @@
              * @extends      plotOptions.sma
              * @since        6.0.0
              * @product      highstock
+             * @requires     stock/indicators/indicators
+             * @requires     stock/indicators/momentum
              * @optionparent plotOptions.momentum
              */
-            {
+            MomentumIndicator.defaultOptions = merge(SMAIndicator.defaultOptions, {
                 params: {
-                    period: 14
+                    index: 3
                 }
-            },
-            /**
-             * @lends Highcharts.Series#
-             */
-            {
-                nameBase: 'Momentum',
-                getValues: function (series, params) {
-                    var period = params.period,
-                        xVal = series.xData,
-                        yVal = series.yData,
-                        yValLen = yVal ? yVal.length : 0,
-                        xValue = xVal[0],
-                        yValue = yVal[0],
-                        MM = [],
-                        xData = [],
-                        yData = [],
-                        index,
-                        i,
-                        points,
-                        MMPoint;
-
-                    if (xVal.length <= period) {
-                        return false;
-                    }
-
-                    // Switch index for OHLC / Candlestick / Arearange
-                    if (isArray(yVal[0])) {
-                        yValue = yVal[0][3];
-                    } else {
-                        return false;
-                    }
-                    // Starting point
-                    points = [
-                        [xValue, yValue]
-                    ];
-
-
-                    // Calculate value one-by-one for each period in visible data
-                    for (i = (period + 1); i < yValLen; i++) {
-                        MMPoint = populateAverage(points, xVal, yVal, i, period, index);
-                        MM.push(MMPoint);
-                        xData.push(MMPoint[0]);
-                        yData.push(MMPoint[1]);
-                    }
-
-                    MMPoint = populateAverage(points, xVal, yVal, i, period, index);
-                    MM.push(MMPoint);
-                    xData.push(MMPoint[0]);
-                    yData.push(MMPoint[1]);
-
-                    return {
-                        values: MM,
-                        xData: xData,
-                        yData: yData
-                    };
-                }
-            }
-        );
-
+            });
+            return MomentumIndicator;
+        }(SMAIndicator));
+        extend(MomentumIndicator.prototype, {
+            nameBase: 'Momentum'
+        });
+        SeriesRegistry.registerSeriesType('momentum', MomentumIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
         /**
          * A `Momentum` series. If the [type](#series.momentum.type) option is not
          * specified, it is inherited from [chart.type](#chart.type).
@@ -143,9 +158,13 @@
          * @since     6.0.0
          * @excluding dataParser, dataURL
          * @product   highstock
+         * @requires  stock/indicators/indicators
+         * @requires  stock/indicators/momentum
          * @apioption series.momentum
          */
+        ''; // to include the above in the js output
 
+        return MomentumIndicator;
     });
     _registerModule(_modules, 'masters/indicators/momentum.src.js', [], function () {
 

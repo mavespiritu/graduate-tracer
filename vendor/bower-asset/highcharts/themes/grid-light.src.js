@@ -1,7 +1,7 @@
 /**
- * @license Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highcharts JS v9.3.3 (2022-02-01)
  *
- * (c) 2009-2019 Torstein Honsi
+ * (c) 2009-2021 Torstein Honsi
  *
  * License: www.highcharts.com/license
  */
@@ -26,94 +26,121 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/grid-light.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'Extensions/Themes/GridLight.js', [_modules['Core/DefaultOptions.js'], _modules['Core/Utilities.js']], function (D, U) {
         /* *
          *
-         *  (c) 2010-2019 Torstein Honsi
+         *  (c) 2010-2021 Torstein Honsi
          *
          *  License: www.highcharts.com/license
          *
          *  Grid-light theme for Highcharts JS
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-        /* global document */
-
-
-        // Load the fonts
-        Highcharts.createElement('link', {
-            href: 'https://fonts.googleapis.com/css?family=Dosis:400,600',
-            rel: 'stylesheet',
-            type: 'text/css'
-        }, null, document.getElementsByTagName('head')[0]);
-
-        Highcharts.theme = {
-            colors: ['#7cb5ec', '#f7a35c', '#90ee7e', '#7798BF', '#aaeeee', '#ff0066',
-                '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
-            chart: {
-                backgroundColor: null,
-                style: {
-                    fontFamily: 'Dosis, sans-serif'
-                }
-            },
-            title: {
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase'
-                }
-            },
-            tooltip: {
-                borderWidth: 0,
-                backgroundColor: 'rgba(219,219,216,0.8)',
-                shadow: false
-            },
-            legend: {
-                itemStyle: {
-                    fontWeight: 'bold',
-                    fontSize: '13px'
-                }
-            },
-            xAxis: {
-                gridLineWidth: 1,
-                labels: {
+        var setOptions = D.setOptions;
+        var createElement = U.createElement;
+        /* *
+         *
+         *  Theme
+         *
+         * */
+        var GridLightTheme;
+        (function (GridLightTheme) {
+            /* *
+             *
+             *  Constants
+             *
+             * */
+            GridLightTheme.options = {
+                colors: [
+                    '#7cb5ec', '#f7a35c', '#90ee7e', '#7798BF', '#aaeeee', '#ff0066',
+                    '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'
+                ],
+                chart: {
+                    backgroundColor: null,
                     style: {
-                        fontSize: '12px'
+                        fontFamily: 'Dosis, sans-serif'
                     }
-                }
-            },
-            yAxis: {
-                minorTickInterval: 'auto',
+                },
                 title: {
                     style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold',
                         textTransform: 'uppercase'
                     }
                 },
-                labels: {
-                    style: {
-                        fontSize: '12px'
+                tooltip: {
+                    borderWidth: 0,
+                    backgroundColor: 'rgba(219,219,216,0.8)',
+                    shadow: false
+                },
+                legend: {
+                    backgroundColor: '#F0F0EA',
+                    itemStyle: {
+                        fontWeight: 'bold',
+                        fontSize: '13px'
+                    }
+                },
+                xAxis: {
+                    gridLineWidth: 1,
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
+                },
+                yAxis: {
+                    minorTickInterval: 'auto',
+                    title: {
+                        style: {
+                            textTransform: 'uppercase'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
+                },
+                plotOptions: {
+                    candlestick: {
+                        lineColor: '#404048'
                     }
                 }
-            },
-            plotOptions: {
-                candlestick: {
-                    lineColor: '#404048'
-                }
-            },
+            };
+            /* *
+             *
+             *  Functions
+             *
+             * */
+            /**
+             * Apply the theme.
+             */
+            function apply() {
+                // Load the fonts
+                createElement('link', {
+                    href: 'https://fonts.googleapis.com/css?family=Dosis:400,600',
+                    rel: 'stylesheet',
+                    type: 'text/css'
+                }, null, document.getElementsByTagName('head')[0]);
+                // Apply the theme
+                setOptions(GridLightTheme.options);
+            }
+            GridLightTheme.apply = apply;
+        })(GridLightTheme || (GridLightTheme = {}));
+        /* *
+         *
+         *  Default Export
+         *
+         * */
 
-
-            // General
-            background2: '#F0F0EA'
-
-        };
-
-        // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
-
+        return GridLightTheme;
     });
-    _registerModule(_modules, 'masters/themes/grid-light.src.js', [], function () {
+    _registerModule(_modules, 'masters/themes/grid-light.src.js', [_modules['Core/Globals.js'], _modules['Extensions/Themes/GridLight.js']], function (H, GridLightTheme) {
 
+        H.theme = GridLightTheme.options;
+        GridLightTheme.apply();
 
     });
 }));

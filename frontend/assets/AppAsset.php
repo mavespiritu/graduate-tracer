@@ -12,11 +12,14 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+        'css/font-awesome.css',
+        'css/font-awesome.min.css',
         'css/pace.css',
         'css/site.css',
         'css/animate.css',
     ];
     public $js = [
+        'js/site.js',
         'js/pace.js',
     ];
     public $depends = [
@@ -24,6 +27,6 @@ class AppAsset extends AssetBundle
         'yii\bootstrap\BootstrapAsset',
         'yii\web\JqueryAsset',
         'Zelenin\yii\SemanticUI\assets\SemanticUICSSAsset',
-        'Zelenin\yii\SemanticUI\assets\SemanticUIJSAsset'
+        'Zelenin\yii\SemanticUI\assets\SemanticUIJSAsset',
     ];
 }

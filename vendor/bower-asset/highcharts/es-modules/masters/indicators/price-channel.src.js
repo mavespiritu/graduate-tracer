@@ -1,14 +1,14 @@
 /**
- * @license  @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  * @module highcharts/indicators/price-channel
  * @requires highcharts
  * @requires highcharts/modules/stock
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Daniel Studencki
+ * (c) 2010-2021 Daniel Studencki
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../indicators/price-channel.src.js';
+import '../../Stock/Indicators/PC/PCIndicator.js';

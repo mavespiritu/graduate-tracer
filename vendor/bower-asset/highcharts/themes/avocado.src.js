@@ -1,7 +1,7 @@
 /**
- * @license Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highcharts JS v9.3.3 (2022-02-01)
  *
- * (c) 2009-2019 Highsoft AS
+ * (c) 2009-2021 Highsoft AS
  *
  * License: www.highcharts.com/license
  */
@@ -26,10 +26,10 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'themes/avocado.js', [_modules['parts/Globals.js']], function (Highcharts) {
+    _registerModule(_modules, 'Extensions/Themes/Avocado.js', [_modules['Core/DefaultOptions.js']], function (D) {
         /* *
          *
-         *  (c) 2010-2019 Highsoft AS
+         *  (c) 2010-2021 Highsoft AS
          *
          *  Author: Øystein Moseng
          *
@@ -38,39 +38,66 @@
          *  Accessible high-contrast theme for Highcharts. Considers colorblindness and
          *  monochrome rendering.
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
+         * */
+        var setOptions = D.setOptions;
+        /* *
+         *
+         *  Theme
+         *
+         * */
+        var AvocadoTheme;
+        (function (AvocadoTheme) {
+            /* *
+             *
+             *  Constants
+             *
+             * */
+            AvocadoTheme.options = {
+                colors: ['#F3E796', '#95C471', '#35729E', '#251735'],
+                colorAxis: {
+                    maxColor: '#05426E',
+                    minColor: '#F3E796'
+                },
+                plotOptions: {
+                    map: {
+                        nullColor: '#FCFEFE'
+                    }
+                },
+                navigator: {
+                    maskFill: 'rgba(170, 205, 170, 0.5)',
+                    series: {
+                        color: '#95C471',
+                        lineColor: '#35729E'
+                    }
+                }
+            };
+            /* *
+             *
+             *  Functions
+             *
+             * */
+            /**
+             * Apply the theme.
+             */
+            function apply() {
+                setOptions(AvocadoTheme.options);
+            }
+            AvocadoTheme.apply = apply;
+        })(AvocadoTheme || (AvocadoTheme = {}));
+        /* *
+         *
+         *  Default Export
+         *
          * */
 
-
-
-        Highcharts.theme = {
-            colors: ['#F3E796', '#95C471', '#35729E', '#251735'],
-
-            colorAxis: {
-                maxColor: '#05426E',
-                minColor: '#F3E796'
-            },
-
-            plotOptions: {
-                map: {
-                    nullColor: '#fcfefe'
-                }
-            },
-
-            navigator: {
-                maskFill: 'rgba(170, 205, 170, 0.5)',
-                series: {
-                    color: '#95C471',
-                    lineColor: '#35729E'
-                }
-            }
-        };
-
-        // Apply the theme
-        Highcharts.setOptions(Highcharts.theme);
-
+        return AvocadoTheme;
     });
-    _registerModule(_modules, 'masters/themes/avocado.src.js', [], function () {
+    _registerModule(_modules, 'masters/themes/avocado.src.js', [_modules['Core/Globals.js'], _modules['Extensions/Themes/Avocado.js']], function (H, AvocadoTheme) {
 
+        H.theme = AvocadoTheme.options;
+        AvocadoTheme.apply();
 
     });
 }));

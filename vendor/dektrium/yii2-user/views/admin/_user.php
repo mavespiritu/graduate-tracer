@@ -1,5 +1,6 @@
 <?php
 use kartik\select2\Select2;
+use yii\helpers\Url;
 /*
  * This file is part of the Dektrium project.
  *
@@ -19,18 +20,34 @@ use kartik\select2\Select2;
 	<div class="row">
 		<div class="col-md-12">
 			<?= $form->field($userinfo, 'course_id')->widget(Select2::classname(), [
-                'data' => $courses,
-                'options' => ['placeholder' => 'Select One','multiple' => false, 'class'=>'course-select'],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-            ]); ?>
+				'data' => $courses,
+				'options' => ['multiple' => false, 'placeholder' => 'Select one', 'class'=>'course-select', 'theme' => 'classic'],
+				'pluginOptions' => [
+					'allowClear' =>  false,
+				],
+				'pluginEvents'=>[
+					'select2:select'=>'
+						function(){
+							$.ajax({
+								url: "'.Url::to(['/site/majors-list']).'",
+								data: {
+									id: this.value,
+									}
+							}).done(function(result) {
+								$(".major-select").html("").select2({ data:result, multiple: false, theme:"'.Select2::THEME_KRAJEE.'", width:"100%",placeholder:"Select one", allowClear: true});
+								$(".major-select").select2("val","");
+							});
+						}'
+
+				]
+				])->label('Course');
+			?>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
 			<?= $form->field($userinfo, 'major_id')->widget(Select2::classname(), [
-                'data' => $schools,
+                'data' => $majors,
                 'options' => ['placeholder' => 'Select One','multiple' => false, 'class'=>'major-select'],
                 'pluginOptions' => [
                     'allowClear' => true

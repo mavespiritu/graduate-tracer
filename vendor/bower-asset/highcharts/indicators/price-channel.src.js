@@ -1,9 +1,9 @@
 /**
- * @license  Highcharts JS v7.1.2 (2019-06-04)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  *
- * Indicator series type for Highstock
+ * Indicator series type for Highcharts Stock
  *
- * (c) 2010-2019 Daniel Studencki
+ * (c) 2010-2021 Daniel Studencki
  *
  * License: www.highcharts.com/license
  */
@@ -28,87 +28,108 @@
             obj[path] = fn.apply(null, args);
         }
     }
-    _registerModule(_modules, 'mixins/reduce-array.js', [_modules['parts/Globals.js']], function (H) {
-        /**
-         * (c) 2010-2019 Pawel Fus & Daniel Studencki
-         *
-         * License: www.highcharts.com/license
-         */
-
-
-        var reduce = H.reduce;
-
-        var reduceArrayMixin = {
-            /**
-             * Get min value of array filled by OHLC data.
-             * @param {array} arr Array of OHLC points (arrays).
-             * @param {string} index Index of "low" value in point array.
-             * @returns {number} Returns min value.
-             */
-            minInArray: function (arr, index) {
-                return reduce(arr, function (min, target) {
-                    return Math.min(min, target[index]);
-                }, Number.MAX_VALUE);
-            },
-            /**
-             * Get max value of array filled by OHLC data.
-             * @param {array} arr Array of OHLC points (arrays).
-             * @param {string} index Index of "high" value in point array.
-             * @returns {number} Returns max value.
-             */
-            maxInArray: function (arr, index) {
-                return reduce(arr, function (min, target) {
-                    return Math.max(min, target[index]);
-                }, -Number.MAX_VALUE);
-            },
-            /**
-             * Get extremes of array filled by OHLC data.
-             * @param {array} arr Array of OHLC points (arrays).
-             * @param {string} minIndex Index of "low" value in point array.
-             * @param {string} maxIndex Index of "high" value in point array.
-             * @returns {array} Returns array with min and max value.
-             */
-            getArrayExtremes: function (arr, minIndex, maxIndex) {
-                return reduce(arr, function (prev, target) {
-                    return [
-                        Math.min(prev[0], target[minIndex]),
-                        Math.max(prev[1], target[maxIndex])
-                    ];
-                }, [Number.MAX_VALUE, -Number.MAX_VALUE]);
-            }
-        };
-
-
-        return reduceArrayMixin;
-    });
-    _registerModule(_modules, 'mixins/multipe-lines.js', [_modules['parts/Globals.js']], function (H) {
+    _registerModule(_modules, 'Stock/Indicators/ArrayUtilities.js', [], function () {
         /**
          *
-         *  (c) 2010-2019 Wojciech Chmiel
+         *  (c) 2010-2021 Pawel Fus & Daniel Studencki
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
-        var each = H.each,
-            merge = H.merge,
-            error = H.error,
-            defined = H.defined,
-            SMA = H.seriesTypes.sma;
-
+        /* *
+         *
+         *  Functions
+         *
+         * */
         /**
-         * Mixin useful for all indicators that have more than one line.
-         * Merge it with your implementation where you will provide
-         * getValues method appropriate to your indicator and pointArrayMap,
-         * pointValKey, linesApiNames properites. Notice that pointArrayMap
-         * should be consistent with amount of lines calculated in getValues method.
+         * Get extremes of array filled by OHLC data.
+         *
+         * @private
+         *
+         * @param {Array<Array<number>>} arr
+         * Array of OHLC points (arrays).
+         *
+         * @param {number} minIndex
+         * Index of "low" value in point array.
+         *
+         * @param {number} maxIndex
+         * Index of "high" value in point array.
+         *
+         * @return {Array<number,number>}
+         * Returns array with min and max value.
+         */
+        function getArrayExtremes(arr, minIndex, maxIndex) {
+            return arr.reduce(function (prev, target) { return [
+                Math.min(prev[0], target[minIndex]),
+                Math.max(prev[1], target[maxIndex])
+            ]; }, [Number.MAX_VALUE, -Number.MAX_VALUE]);
+        }
+        /* *
+         *
+         *  Default Export
+         *
+         * */
+        var ArrayUtilities = {
+                getArrayExtremes: getArrayExtremes
+            };
+
+        return ArrayUtilities;
+    });
+    _registerModule(_modules, 'Stock/Indicators/MultipleLinesComposition.js', [_modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (SeriesRegistry, U) {
+        /**
+         *
+         *  (c) 2010-2021 Wojciech Chmiel
+         *
+         *  License: www.highcharts.com/license
+         *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
+         * */
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var defined = U.defined,
+            error = U.error,
+            merge = U.merge;
+        /* *
+         *
+         *  Composition
+         *
+         * */
+        /**
+         * Composition useful for all indicators that have more than one line. Compose
+         * it with your implementation where you will provide the `getValues` method
+         * appropriate to your indicator and `pointArrayMap`, `pointValKey`,
+         * `linesApiNames` properties. Notice that `pointArrayMap` should be consistent
+         * with the amount of lines calculated in the `getValues` method.
          *
          * @private
          * @mixin multipleLinesMixin
          */
-        var multipleLinesMixin = {
+        var MultipleLinesComposition;
+        (function (MultipleLinesComposition) {
+            /* *
+             *
+             *  Declarations
+             *
+             * */
+            /* *
+             *
+             *  Constants
+             *
+             * */
+            var composedClasses = [];
+            /**
+             * Additional lines DOCS names. Elements of linesApiNames array should
+             * be consistent with DOCS line names defined in your implementation.
+             * Notice that linesApiNames should have decreased amount of elements
+             * relative to pointArrayMap (without pointValKey).
+             *
+             * @private
+             * @name multipleLinesMixin.linesApiNames
+             * @type {Array<string>}
+             */
+            var linesApiNames = ['bottomLine'];
             /**
              * Lines ids. Required to plot appropriate amount of lines.
              * Notice that pointArrayMap should have more elements than
@@ -120,8 +141,17 @@
              * @name multipleLinesMixin.pointArrayMap
              * @type {Array<string>}
              */
-            pointArrayMap: ['top', 'bottom'],
-
+            var pointArrayMap = ['top', 'bottom'];
+            /**
+             * Names of the lines, bewteen which the area should be plotted.
+             * If the drawing of the area should
+             * be disabled for some indicators, leave this option as an empty array.
+             * Names should be the same as the names in the pointArrayMap.
+             * @private
+             * @name multipleLinesMixin.areaLinesNames
+             * @type {Array<string>}
+             */
+            var areaLinesNames = ['top'];
             /**
              * Main line id.
              *
@@ -129,125 +159,95 @@
              * @name multipleLinesMixin.pointValKey
              * @type {string}
              */
-            pointValKey: 'top',
-
-            /**
-             * Additional lines DOCS names. Elements of linesApiNames array should
-             * be consistent with DOCS line names defined in your implementation.
-             * Notice that linesApiNames should have decreased amount of elements
-             * relative to pointArrayMap (without pointValKey).
+            var pointValKey = 'top';
+            /* *
              *
-             * @private
-             * @name multipleLinesMixin.linesApiNames
-             * @type {Array<string>}
-             */
-            linesApiNames: ['bottomLine'],
-
-            /**
-             * Create translatedLines Collection based on pointArrayMap.
+             *  Functions
              *
-             * @private
-             * @function multipleLinesMixin.getTranslatedLinesNames
-             *
-             * @param {string} excludedValue
-             *        pointValKey - main line id
-             *
-             * @return {Array<string>}
-             *         Returns translated lines names without excluded value.
-             */
-            getTranslatedLinesNames: function (excludedValue) {
-                var translatedLines = [];
-
-                each(this.pointArrayMap, function (propertyName) {
-                    if (propertyName !== excludedValue) {
-                        translatedLines.push(
-                            'plot' +
-                            propertyName.charAt(0).toUpperCase() +
-                            propertyName.slice(1)
-                        );
-                    }
-                });
-
-                return translatedLines;
-            },
+             * */
+            /* eslint-disable valid-jsdoc */
             /**
              * @private
-             * @function multipleLinesMixin.toYData
-             *
-             * @param {string} point
-             *
-             * @return {Array<number>}
-             *         Returns point Y value for all lines
              */
-            toYData: function (point) {
-                var pointColl = [];
-
-                each(this.pointArrayMap, function (propertyName) {
-                    pointColl.push(point[propertyName]);
-                });
-                return pointColl;
-            },
+            function compose(IndicatorClass) {
+                if (composedClasses.indexOf(IndicatorClass) === -1) {
+                    composedClasses.push(IndicatorClass);
+                    var proto = IndicatorClass.prototype;
+                    proto.linesApiNames = (proto.linesApiNames ||
+                        linesApiNames.slice());
+                    proto.pointArrayMap = (proto.pointArrayMap ||
+                        pointArrayMap.slice());
+                    proto.pointValKey = (proto.pointValKey ||
+                        pointValKey);
+                    proto.areaLinesNames = (proto.areaLinesNames ||
+                        areaLinesNames.slice());
+                    proto.drawGraph = drawGraph;
+                    proto.getGraphPath = getGraphPath;
+                    proto.toYData = toYData;
+                    proto.translate = translate;
+                    proto.getTranslatedLinesNames = getTranslatedLinesNames;
+                }
+                return IndicatorClass;
+            }
+            MultipleLinesComposition.compose = compose;
             /**
-             * Add lines plot pixel values.
+             * Create the path based on points provided as argument.
+             * If indicator.nextPoints option is defined, create the areaFill.
              *
-             * @private
-             * @function multipleLinesMixin.translate
+             * @param points Points on which the path should be created
              */
-            translate: function () {
-                var indicator = this,
-                    pointArrayMap = indicator.pointArrayMap,
-                    LinesNames = [],
-                    value;
-
-                LinesNames = indicator.getTranslatedLinesNames();
-
-                SMA.prototype.translate.apply(indicator, arguments);
-
-                each(indicator.points, function (point) {
-                    each(pointArrayMap, function (propertyName, i) {
-                        value = point[propertyName];
-
-                        if (value !== null) {
-                            point[LinesNames[i]] = indicator.yAxis.toPixels(
-                                value,
-                                true
-                            );
+            function getGraphPath(points) {
+                var indicator = this;
+                var areaPath,
+                    path = [],
+                    higherAreaPath = [];
+                points = points || this.points;
+                // Render Span
+                if (indicator.fillGraph && indicator.nextPoints) {
+                    areaPath = SMAIndicator.prototype.getGraphPath.call(indicator, indicator.nextPoints);
+                    if (areaPath && areaPath.length) {
+                        areaPath[0][0] = 'L';
+                        path = SMAIndicator.prototype.getGraphPath.call(indicator, points);
+                        higherAreaPath = areaPath.slice(0, path.length);
+                        // Reverse points, so that the areaFill will start from the end:
+                        for (var i = higherAreaPath.length - 1; i >= 0; i--) {
+                            path.push(higherAreaPath[i]);
                         }
-                    });
-                });
-            },
+                    }
+                }
+                else {
+                    path = SMAIndicator.prototype.getGraphPath.apply(indicator, arguments);
+                }
+                return path;
+            }
             /**
              * Draw main and additional lines.
              *
              * @private
              * @function multipleLinesMixin.drawGraph
              */
-            drawGraph: function () {
+            function drawGraph() {
                 var indicator = this,
                     pointValKey = indicator.pointValKey,
                     linesApiNames = indicator.linesApiNames,
+                    areaLinesNames = indicator.areaLinesNames,
                     mainLinePoints = indicator.points,
-                    pointsLength = mainLinePoints.length,
                     mainLineOptions = indicator.options,
                     mainLinePath = indicator.graph,
                     gappedExtend = {
                         options: {
                             gapSize: mainLineOptions.gapSize
                         }
-                    },
-                    secondaryLines = [], // additional lines point place holders
-                    secondaryLinesNames = indicator.getTranslatedLinesNames(
-                        pointValKey
-                    ),
+                    }, 
+                    // additional lines point place holders:
+                    secondaryLines = [],
+                    secondaryLinesNames = indicator.getTranslatedLinesNames(pointValKey);
+                var pointsLength = mainLinePoints.length,
                     point;
-
-
                 // Generate points for additional lines:
-                each(secondaryLinesNames, function (plotLine, index) {
-
+                secondaryLinesNames.forEach(function (plotLine, index) {
                     // create additional lines point place holders
                     secondaryLines[index] = [];
-
                     while (pointsLength--) {
                         point = mainLinePoints[pointsLength];
                         secondaryLines[index].push({
@@ -257,65 +257,170 @@
                             isNull: !defined(point[plotLine])
                         });
                     }
-
                     pointsLength = mainLinePoints.length;
                 });
-
+                // Modify options and generate area fill:
+                if (this.userOptions.fillColor && areaLinesNames.length) {
+                    var index = secondaryLinesNames.indexOf(getLineName(areaLinesNames[0])),
+                        secondLinePoints = secondaryLines[index],
+                        firstLinePoints = areaLinesNames.length === 1 ?
+                            mainLinePoints :
+                            secondaryLines[secondaryLinesNames.indexOf(getLineName(areaLinesNames[1]))],
+                        originalColor = indicator.color;
+                    indicator.points = firstLinePoints;
+                    indicator.nextPoints = secondLinePoints;
+                    indicator.color = this.userOptions.fillColor;
+                    indicator.options = merge(mainLinePoints, gappedExtend);
+                    indicator.graph = indicator.area;
+                    indicator.fillGraph = true;
+                    SeriesRegistry.seriesTypes.sma.prototype.drawGraph.call(indicator);
+                    indicator.area = indicator.graph;
+                    // Clean temporary properties:
+                    delete indicator.nextPoints;
+                    delete indicator.fillGraph;
+                    indicator.color = originalColor;
+                }
                 // Modify options and generate additional lines:
-                each(linesApiNames, function (lineName, i) {
+                linesApiNames.forEach(function (lineName, i) {
                     if (secondaryLines[i]) {
                         indicator.points = secondaryLines[i];
                         if (mainLineOptions[lineName]) {
-                            indicator.options = merge(
-                                mainLineOptions[lineName].styles,
-                                gappedExtend
-                            );
-                        } else {
-                            error(
-                                'Error: "There is no ' + lineName +
+                            indicator.options = merge(mainLineOptions[lineName].styles, gappedExtend);
+                        }
+                        else {
+                            error('Error: "There is no ' + lineName +
                                 ' in DOCS options declared. Check if linesApiNames' +
                                 ' are consistent with your DOCS line names."' +
-                                ' at mixin/multiple-line.js:34'
-                            );
+                                ' at mixin/multiple-line.js:34');
                         }
-
                         indicator.graph = indicator['graph' + lineName];
-                        SMA.prototype.drawGraph.call(indicator);
-
+                        SMAIndicator.prototype.drawGraph.call(indicator);
                         // Now save lines:
                         indicator['graph' + lineName] = indicator.graph;
-                    } else {
-                        error(
-                            'Error: "' + lineName + ' doesn\'t have equivalent ' +
+                    }
+                    else {
+                        error('Error: "' + lineName + ' doesn\'t have equivalent ' +
                             'in pointArrayMap. To many elements in linesApiNames ' +
-                            'relative to pointArrayMap."'
-                        );
+                            'relative to pointArrayMap."');
                     }
                 });
-
                 // Restore options and draw a main line:
                 indicator.points = mainLinePoints;
                 indicator.options = mainLineOptions;
                 indicator.graph = mainLinePath;
-                SMA.prototype.drawGraph.call(indicator);
+                SMAIndicator.prototype.drawGraph.call(indicator);
             }
-        };
+            /**
+             * Create translatedLines Collection based on pointArrayMap.
+             *
+             * @private
+             * @function multipleLinesMixin.getTranslatedLinesNames
+             * @param {string} [excludedValue]
+             *        Main line id
+             * @return {Array<string>}
+             *         Returns translated lines names without excluded value.
+             */
+            function getTranslatedLinesNames(excludedValue) {
+                var translatedLines = [];
+                (this.pointArrayMap || []).forEach(function (propertyName) {
+                    if (propertyName !== excludedValue) {
+                        translatedLines.push(getLineName(propertyName));
+                    }
+                });
+                return translatedLines;
+            }
+            /**
+             * Generate the API name of the line
+             * @param propertyName name of the line
+             */
+            function getLineName(propertyName) {
+                return ('plot' +
+                    propertyName.charAt(0).toUpperCase() +
+                    propertyName.slice(1));
+            }
+            /**
+             * @private
+             * @function multipleLinesMixin.toYData
+             * @param {Highcharts.Point} point
+             *        Indicator point
+             * @return {Array<number>}
+             *         Returns point Y value for all lines
+             */
+            function toYData(point) {
+                var pointColl = [];
+                (this.pointArrayMap || []).forEach(function (propertyName) {
+                    pointColl.push(point[propertyName]);
+                });
+                return pointColl;
+            }
+            /**
+             * Add lines plot pixel values.
+             *
+             * @private
+             * @function multipleLinesMixin.translate
+             */
+            function translate() {
+                var indicator = this,
+                    pointArrayMap = indicator.pointArrayMap;
+                var LinesNames = [],
+                    value;
+                LinesNames = indicator.getTranslatedLinesNames();
+                SMAIndicator.prototype.translate.apply(indicator, arguments);
+                indicator.points.forEach(function (point) {
+                    pointArrayMap.forEach(function (propertyName, i) {
+                        value = point[propertyName];
+                        // If the modifier, like for example compare exists,
+                        // modified the original value by that method, #15867.
+                        if (indicator.dataModify) {
+                            value = indicator.dataModify.modifyValue(value);
+                        }
+                        if (value !== null) {
+                            point[LinesNames[i]] = indicator.yAxis.toPixels(value, true);
+                        }
+                    });
+                });
+            }
+        })(MultipleLinesComposition || (MultipleLinesComposition = {}));
+        /* *
+         *
+         *  Default Export
+         *
+         * */
 
-
-        return multipleLinesMixin;
+        return MultipleLinesComposition;
     });
-    _registerModule(_modules, 'indicators/price-channel.src.js', [_modules['parts/Globals.js'], _modules['mixins/reduce-array.js'], _modules['mixins/multipe-lines.js']], function (H, reduceArrayMixin, multipleLinesMixin) {
+    _registerModule(_modules, 'Stock/Indicators/PC/PCIndicator.js', [_modules['Stock/Indicators/ArrayUtilities.js'], _modules['Stock/Indicators/MultipleLinesComposition.js'], _modules['Core/Color/Palettes.js'], _modules['Core/Series/SeriesRegistry.js'], _modules['Core/Utilities.js']], function (AU, MultipleLinesComposition, Palettes, SeriesRegistry, U) {
         /* *
          *
          *  License: www.highcharts.com/license
          *
+         *  !!!!!!! SOURCE GETS TRANSPILED BY TYPESCRIPT. EDIT TS FILE ONLY. !!!!!!!
+         *
          * */
-
-
-
-        var getArrayExtremes = reduceArrayMixin.getArrayExtremes,
-            merge = H.merge;
-
+        var __extends = (this && this.__extends) || (function () {
+                var extendStatics = function (d,
+            b) {
+                    extendStatics = Object.setPrototypeOf ||
+                        ({ __proto__: [] } instanceof Array && function (d,
+            b) { d.__proto__ = b; }) ||
+                        function (d,
+            b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+                return extendStatics(d, b);
+            };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+        var SMAIndicator = SeriesRegistry.seriesTypes.sma;
+        var merge = U.merge,
+            extend = U.extend;
+        /* *
+         *
+         *  Class
+         *
+         * */
         /**
          * The Price Channel series type.
          *
@@ -325,9 +430,70 @@
          *
          * @augments Highcharts.Series
          */
-        H.seriesType(
-            'pc',
-            'sma',
+        var PCIndicator = /** @class */ (function (_super) {
+                __extends(PCIndicator, _super);
+            function PCIndicator() {
+                /* *
+                 *
+                 *  Static Properties
+                 *
+                 * */
+                var _this = _super !== null && _super.apply(this,
+                    arguments) || this;
+                /* *
+                *
+                *  Properties
+                *
+                * */
+                _this.data = void 0;
+                _this.options = void 0;
+                _this.points = void 0;
+                return _this;
+            }
+            /* *
+            *
+            *  Functions
+            *
+            * */
+            PCIndicator.prototype.getValues = function (series, params) {
+                var period = params.period,
+                    xVal = series.xData,
+                    yVal = series.yData,
+                    yValLen = yVal ? yVal.length : 0, 
+                    // 0- date, 1-top line, 2-middle line, 3-bottom line
+                    PC = [], 
+                    // middle line, top line and bottom line
+                    ML,
+                    TL,
+                    BL,
+                    date,
+                    low = 2,
+                    high = 1,
+                    xData = [],
+                    yData = [],
+                    slicedY,
+                    extremes,
+                    i;
+                if (yValLen < period) {
+                    return;
+                }
+                for (i = period; i <= yValLen; i++) {
+                    date = xVal[i - 1];
+                    slicedY = yVal.slice(i - period, i);
+                    extremes = AU.getArrayExtremes(slicedY, low, high);
+                    TL = extremes[1];
+                    BL = extremes[0];
+                    ML = (TL + BL) / 2;
+                    PC.push([date, TL, ML, BL]);
+                    xData.push(date);
+                    yData.push([TL, ML, BL]);
+                }
+                return {
+                    values: PC,
+                    xData: xData,
+                    yData: yData
+                };
+            };
             /**
              * Price channel (PC). This series requires the `linkedTo` option to be
              * set and should be loaded after the `stock/indicators/indicators.js`.
@@ -342,13 +508,26 @@
              *               navigatorOptions, pointInterval, pointIntervalUnit,
              *               pointPlacement, pointRange, pointStart, showInNavigator,
              *               stacking
+             * @requires     stock/indicators/indicators
+             * @requires     stock/indicators/price-channel
              * @optionparent plotOptions.pc
              */
-            {
+            PCIndicator.defaultOptions = merge(SMAIndicator.defaultOptions, {
+                /**
+                 * Option for fill color between lines in Price channel Indicator.
+                 *
+                 * @sample {highstock} stock/indicators/indicator-area-fill
+                 *      background fill between lines
+                 *
+                 * @type {Highcharts.Color}
+                 * @apioption plotOptions.pc.fillColor
+                 *
+                 */
                 /**
                  * @excluding index
                  */
                 params: {
+                    index: void 0,
                     period: 20
                 },
                 lineWidth: 1,
@@ -360,7 +539,7 @@
                          *
                          * @type {Highcharts.ColorString}
                          */
-                        lineColor: '#7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b #91e8e1'.split(' ')[2],
+                        lineColor: Palettes.colors[2],
                         /**
                          * Pixel width of the line.
                          */
@@ -375,7 +554,7 @@
                          *
                          * @type {Highcharts.ColorString}
                          */
-                        lineColor: '#7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b #91e8e1'.split(' ')[8],
+                        lineColor: Palettes.colors[8],
                         /**
                          * Pixel width of the line.
                          */
@@ -385,57 +564,24 @@
                 dataGrouping: {
                     approximation: 'averages'
                 }
-            },
-            /**
-             * @lends Highcharts.Series#
-             */
-            merge(multipleLinesMixin, {
-                pointArrayMap: ['top', 'middle', 'bottom'],
-                pointValKey: 'middle',
-                nameBase: 'Price Channel',
-                nameComponents: ['period'],
-                linesApiNames: ['topLine', 'bottomLine'],
-                getValues: function (series, params) {
-                    var period = params.period,
-                        xVal = series.xData,
-                        yVal = series.yData,
-                        yValLen = yVal ? yVal.length : 0,
-                        PC = [], // 0- date, 1-top line, 2-middle line, 3-bottom line
-                        ML, TL, BL, // middle line, top line and bottom line
-                        date,
-                        low = 2,
-                        high = 1,
-                        xData = [],
-                        yData = [],
-                        slicedY,
-                        extremes,
-                        i;
-
-                    if (yValLen < period) {
-                        return false;
-                    }
-
-                    for (i = period; i <= yValLen; i++) {
-                        date = xVal[i - 1];
-                        slicedY = yVal.slice(i - period, i);
-                        extremes = getArrayExtremes(slicedY, low, high);
-                        TL = extremes[1];
-                        BL = extremes[0];
-                        ML = (TL + BL) / 2;
-                        PC.push([date, TL, ML, BL]);
-                        xData.push(date);
-                        yData.push([TL, ML, BL]);
-                    }
-
-                    return {
-                        values: PC,
-                        xData: xData,
-                        yData: yData
-                    };
-                }
-            })
-        );
-
+            });
+            return PCIndicator;
+        }(SMAIndicator));
+        extend(PCIndicator.prototype, {
+            areaLinesNames: ['top', 'bottom'],
+            nameBase: 'Price Channel',
+            nameComponents: ['period'],
+            linesApiNames: ['topLine', 'bottomLine'],
+            pointArrayMap: ['top', 'middle', 'bottom'],
+            pointValKey: 'middle'
+        });
+        MultipleLinesComposition.compose(PCIndicator);
+        SeriesRegistry.registerSeriesType('pc', PCIndicator);
+        /* *
+         *
+         *  Default Export
+         *
+         * */
         /**
          * A Price channel indicator. If the [type](#series.pc.type) option is not
          * specified, it is inherited from [chart.type](#chart.type).
@@ -447,9 +593,13 @@
          *               joinBy, keys, navigatorOptions, pointInterval,
          *               pointIntervalUnit, pointPlacement, pointRange, pointStart,
          *               showInNavigator, stacking
-         * @optionparent series.pc
+         * @requires     stock/indicators/indicators
+         * @requires     stock/indicators/price-channel
+         * @apioption    series.pc
          */
+        ''; // to include the above in the js output
 
+        return PCIndicator;
     });
     _registerModule(_modules, 'masters/indicators/price-channel.src.js', [], function () {
 

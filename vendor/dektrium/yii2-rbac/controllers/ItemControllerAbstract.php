@@ -80,7 +80,7 @@ abstract class ItemControllerAbstract extends Controller
             'scenario' => 'create',
         ]);
 
-        $this->performAjaxValidation($model);
+        //$this->performAjaxValidation($model);
 
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
@@ -108,7 +108,7 @@ abstract class ItemControllerAbstract extends Controller
             'item'     => $item,
         ]);
 
-        $this->performAjaxValidation($model);
+        //$this->performAjaxValidation($model);
 
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);

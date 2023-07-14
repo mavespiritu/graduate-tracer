@@ -13,6 +13,23 @@ import * as _Highcharts from "../highcharts.src";
  */
 export function factory(highcharts: typeof Highcharts): void;
 declare module "../highcharts.src" {
+    interface Axis {
+        /**
+         * Drill down to a given category. This is the same as clicking on an
+         * axis label. If multiple series with drilldown are present, all will
+         * drill down to the given category.
+         *
+         * See also `Point.doDrilldown` for drilling down on a single point
+         * instance.
+         *
+         * @param x
+         *        The index of the category
+         *
+         * @param originalEvent
+         *        The original event, used internally.
+         */
+        drilldownCategory(x: number, originalEvent?: MouseEvent): void;
+    }
     interface Chart {
         /**
          * Add a series to the chart as drilldown from a specific point in the
@@ -30,16 +47,28 @@ declare module "../highcharts.src" {
         addSeriesAsDrilldown(point: Point, options: SeriesOptionsType): void;
         /**
          * When the chart is drilled down to a child series, calling
-         * `chart.drillUp()` will drill up to the parent series. Requires the
-         * drilldown module.
+         * `chart.drillUp()` will drill up to the parent series.
          */
         drillUp(): void;
+    }
+    interface Point {
+        /**
+         * Perform drilldown on a point instance. The drilldown property must be
+         * set on the point options.
+         *
+         * To drill down multiple points in the same category, use
+         * `Axis.drilldownCategory` instead.
+         */
+        doDrilldown(): void;
     }
     interface SVGElement {
         /**
          * A general fadeIn method.
+         *
+         * @param animation
+         *        The animation options for the element fade.
          */
-        fadeIn(animation?: AnimationOptionsObject): void;
+        fadeIn(animation?: (boolean|Partial<AnimationOptionsObject>)): void;
     }
 }
 export default factory;

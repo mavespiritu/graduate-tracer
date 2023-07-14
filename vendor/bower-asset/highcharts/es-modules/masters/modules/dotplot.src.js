@@ -1,13 +1,13 @@
 /**
- * @license  @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highcharts JS v9.3.3 (2022-02-01)
  * @module highcharts/modules/dotplot
  * @requires highcharts
  *
  * Dot plot series type for Highcharts
  *
- * (c) 2010-2019 Torstein Honsi
+ * (c) 2010-2021 Torstein Honsi
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../modules/dotplot.src.js';
+import '../../Series/DotPlot/DotPlotSeries.js';

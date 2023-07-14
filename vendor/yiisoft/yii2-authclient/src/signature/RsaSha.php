@@ -1,8 +1,8 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 namespace yii\authclient\signature;
@@ -171,8 +171,11 @@ class RsaSha extends BaseMethod
         $privateKeyId = openssl_pkey_get_private($privateCertificateContent, $key);
         // Sign using the key
         openssl_sign($baseString, $signature, $privateKeyId, $this->algorithm);
-        // Release the key resource
-        openssl_free_key($privateKeyId);
+
+        if (\PHP_VERSION_ID < 80000) {
+            // Release the key resource. Done automatically in PHP 8
+            openssl_free_key($privateKeyId);
+        }
 
         return base64_encode($signature);
     }
@@ -189,8 +192,11 @@ class RsaSha extends BaseMethod
         $publicKeyId = openssl_pkey_get_public($publicCertificate);
         // Check the computed signature against the one passed in the query
         $verificationResult = openssl_verify($baseString, $decodedSignature, $publicKeyId, $this->algorithm);
-        // Release the key resource
-        openssl_free_key($publicKeyId);
+
+        if (\PHP_VERSION_ID < 80000) {
+            // Release the key resource. Done automatically in PHP 8
+            openssl_free_key($publicKeyId);
+        }
 
         return ($verificationResult == 1);
     }

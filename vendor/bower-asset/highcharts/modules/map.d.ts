@@ -35,32 +35,36 @@ declare module "../highcharts" {
          *
          * @return An object with `lat` and `lon` properties.
          */
-        fromPointToLatLon(point: (MapCoordinateObject|Point)): MapLatLonObject;
+        fromPointToLatLon(point: (MapCoordinateObject|Point)): (MapLatLonObject|undefined);
         /**
-         * Highmaps only. Zoom in or out of the map. See also Point#zoomTo. See
-         * Chart#fromLatLonToPoint for how to get the `centerX` and `centerY`
-         * parameters for a geographic location.
+         * Highcharts Maps only. Zoom in or out of the map. See also
+         * Point#zoomTo. See Chart#fromLatLonToPoint for how to get the
+         * `centerX` and `centerY` parameters for a geographic location.
+         *
+         * Deprecated as of v9.3 in favor of MapView.zoomBy.
          *
          * @param howMuch
          *        How much to zoom the map. Values less than 1 zooms in. 0.5
          *        zooms in to half the current view. 2 zooms to twice the
          *        current view. If omitted, the zoom is reset.
          *
-         * @param centerX
-         *        The X axis position to center around if available space.
+         * @param xProjected
+         *        The projected x position to keep stationary when zooming, if
+         *        available space.
          *
-         * @param centerY
-         *        The Y axis position to center around if available space.
+         * @param yProjected
+         *        The projected y position to keep stationary when zooming, if
+         *        available space.
          *
-         * @param mouseX
-         *        Fix the zoom to this position if possible. This is used for
-         *        example in mousewheel events, where the area under the mouse
-         *        should be fixed as we zoom in.
+         * @param chartX
+         *        Keep this chart position stationary if possible. This is used
+         *        for example in mousewheel events, where the area under the
+         *        mouse should be fixed as we zoom in.
          *
-         * @param mouseY
-         *        Fix the zoom to this position if possible.
+         * @param chartY
+         *        Keep this chart position stationary if possible.
          */
-        mapZoom(howMuch?: number, centerX?: number, centerY?: number, mouseX?: number, mouseY?: number): void;
+        mapZoom(howMuch?: number, xProjected?: number, yProjected?: number, chartX?: number, chartY?: number): void;
         /**
          * Highmaps only. Get point from latitude and longitude using specified
          * transform definition.
@@ -74,7 +78,7 @@ declare module "../highcharts" {
          *
          * @return An object with `x` and `y` properties.
          */
-        transformFromLatLon(latLon: MapLatLonObject, transform: object): MapCoordinateObject;
+        transformFromLatLon(latLon: MapLatLonObject, transform: any): MapCoordinateObject;
         /**
          * Highmaps only. Get latLon from point using specified transform
          * definition. The method returns an object with the numeric properties
@@ -90,7 +94,7 @@ declare module "../highcharts" {
          *
          * @return An object with `lat` and `lon` properties.
          */
-        transformToLatLon(point: (MapCoordinateObject|Point), transform: object): MapLatLonObject;
+        transformToLatLon(point: (MapCoordinateObject|Point), transform: any): (MapLatLonObject|undefined);
     }
     /**
      * Result object of a map transformation.
@@ -103,7 +107,7 @@ declare module "../highcharts" {
         /**
          * Y coordinate on the map.
          */
-        y: number;
+        y: (number|null);
     }
     /**
      * A latitude/longitude object.
@@ -119,20 +123,159 @@ declare module "../highcharts" {
         lon: number;
     }
     interface Point {
+        pointPadding?: number;
         /**
          * In Highmaps, when data is loaded from GeoJSON, the GeoJSON item's
          * properies are copied over here.
          */
         properties: any;
+        value?: (number|null);
         /**
          * Highmaps only. Zoom in on the point using the global animation.
          */
         zoomTo(): void;
     }
+    interface PointOptionsObject {
+        pointPadding?: number;
+        value?: (number|null);
+    }
+    /**
+     * Map-optimized chart. Use Chart for common charts.
+     */
+    class MapChart extends Chart {
+        /**
+         * Initializes the chart. The constructor's arguments are passed on
+         * directly.
+         *
+         * @param userOptions
+         *        Custom options.
+         *
+         * @param callback
+         *        Function to run when the chart has loaded and and all external
+         *        images are loaded.
+         *
+         * @fires Highcharts.MapChart#init
+         * @fires Highcharts.MapChart#afterInit
+         */
+        init(userOptions: Options, callback?: Function): void;
+    }
+    /**
+     * The map view handles zooming and centering on the map, and various
+     * client-side projection capabilities.
+     *
+     * On a chart instance, the map view is available as `chart.mapView`.
+     */
+    class MapView {
+        /**
+         * The map view handles zooming and centering on the map, and various
+         * client-side projection capabilities.
+         *
+         * On a chart instance, the map view is available as `chart.mapView`.
+         *
+         * @param chart
+         *        The Chart instance
+         *
+         * @param options
+         *        MapView options
+         */
+        constructor(chart: Chart, options: MapViewOptions);
+        /**
+         * The current center of the view in terms of `[longitude, latitude]`.
+         */
+        readonly center: LonLatArray;
+        /**
+         * The current zoom level of the view.
+         */
+        readonly zoom: number;
+        /**
+         * Fit the view to given bounds
+         *
+         * @param bounds
+         *        Bounds in terms of projected units given as `{ x1, y1, x2, y2
+         *        }`. If not set, fit to the bounds of the current data set
+         *
+         * @param padding
+         *        Padding inside the bounds. A number signifies pixels, while a
+         *        percentage string (like `5%`) can be used as a fraction of the
+         *        plot area size.
+         *
+         * @param redraw
+         *        Whether to redraw the chart immediately
+         *
+         * @param animation
+         *        What animation to use for redraw
+         */
+        fitToBounds(bounds: object, padding?: (number|string), redraw?: boolean, animation?: (boolean|Partial<AnimationOptionsObject>)): void;
+        /**
+         * Convert pixel position to projected units
+         *
+         * @param pos
+         *        The position in pixels
+         *
+         * @return The position in projected units
+         */
+        pixelsToProjectedUnits(pos: PositionObject): PositionObject;
+        /**
+         * Convert projected units to pixel position
+         *
+         * @param pos
+         *        The position in projected units
+         *
+         * @return The position in pixels
+         */
+        projectedUnitsToPixels(pos: PositionObject): PositionObject;
+        /**
+         * Set the view to given center and zoom values.
+         *
+         * @param center
+         *        The center point
+         *
+         * @param zoom
+         *        The zoom level
+         *
+         * @param redraw
+         *        Whether to redraw immediately
+         *
+         * @param animation
+         *        Animation options for the redraw
+         */
+        setView(center: (LonLatArray|undefined), zoom: number, redraw?: boolean, animation?: (boolean|Partial<AnimationOptionsObject>)): void;
+        /**
+         * Update the view with given options
+         *
+         * @param options
+         *        The new map view options to apply
+         *
+         * @param redraw
+         *        Whether to redraw immediately
+         *
+         * @param animation
+         *        The animation to apply to a the redraw
+         */
+        update(options: Partial<MapViewOptions>, redraw?: boolean, animation?: (boolean|Partial<AnimationOptionsObject>)): void;
+        /**
+         * Zoom the map view by a given number
+         *
+         * @param howMuch
+         *        The amount of zoom to apply. 1 zooms in on half the current
+         *        view, -1 zooms out. Pass `undefined` to zoom to the full
+         *        bounds of the map.
+         *
+         * @param coords
+         *        Optional map coordinates to keep fixed
+         *
+         * @param chartCoords
+         *        Optional chart coordinates to keep fixed, in pixels
+         *
+         * @param animation
+         *        The animation to apply to a the redraw
+         */
+        zoomBy(howMuch?: number, coords?: LonLatArray, chartCoords?: Array<number>, animation?: (boolean|Partial<AnimationOptionsObject>)): void;
+    }
     /**
      * Contains all loaded map data for Highmaps.
      */
-    let maps: Dictionary<MapDataObject>;
+    let maps: Record<string, any>;
     /**
      * Highmaps only. Restructure a GeoJSON object in preparation to be read
      * directly by the series.mapData option. The GeoJSON will be broken down to
@@ -152,9 +295,9 @@ declare module "../highcharts" {
      *
      * @return An object ready for the `mapData` option.
      */
-    function geojson(geojson: object, hType?: string): Array<object>;
+    function geojson(geojson: GeoJSON, hType?: string): Array<any>;
     /**
-     * The factory function for creating new map charts. Creates a new Chart
+     * The factory function for creating new map charts. Creates a new MapChart
      * object with different default options than the basic Chart.
      *
      * @param options
@@ -172,9 +315,9 @@ declare module "../highcharts" {
      *
      * @return The chart object.
      */
-    function mapChart(options: Options, callback?: ChartCallbackFunction): Chart;
+    function mapChart(options: Options, callback?: ChartCallbackFunction): MapChart;
     /**
-     * The factory function for creating new map charts. Creates a new Chart
+     * The factory function for creating new map charts. Creates a new MapChart
      * object with different default options than the basic Chart.
      *
      * @param renderTo
@@ -195,11 +338,27 @@ declare module "../highcharts" {
      *
      * @return The chart object.
      */
-    function mapChart(renderTo: (string|HTMLDOMElement), options: Options, callback?: ChartCallbackFunction): Chart;
+    function mapChart(renderTo: (string|HTMLDOMElement), options: Options, callback?: ChartCallbackFunction): MapChart;
     /**
      * Utility for reading SVG paths directly.
+     *
+     * @return Splitted SVG path
      */
-    function splitPath(path: string): SVGPathArray;
+    function splitPath(path: (string|Array<(string|number)>)): SVGPathArray;
+    /**
+     * The world size in terms of 10k meters in the Web Mercator projection, to
+     * match a 256 square tile to zoom level 0
+     */
+    let worldSize: any;
+    /**
+     * If ranges are not specified, determine ranges from rendered bubble series
+     * and render legend again.
+     */
+    function chartDrawChartBox(): void;
+    /**
+     * Toggle bubble legend depending on the visible status of bubble series.
+     */
+    function onSeriesLegendItemClick(): void;
 }
 export default factory;
 export let Highcharts: typeof _Highcharts;

@@ -1,16 +1,16 @@
 /**
- * @license @product.name@ JS v@product.version@ (@product.date@)
+ * @license Highstock JS v9.3.3 (2022-02-01)
  * @module highcharts/modules/stock-tools
  * @requires highcharts
  * @requires highcharts/modules/stock
  *
- * Advanced Highstock tools
+ * Advanced Highcharts Stock tools
  *
- * (c) 2010-2019 Highsoft AS
+ * (c) 2010-2021 Highsoft AS
  * Author: Torstein Honsi
  *
  * License: www.highcharts.com/license
  */
 'use strict';
-import '../../modules/stock-tools-bindings.js';
-import '../../modules/stock-tools-gui.js';
+import '../../Stock/StockToolsBindings.js';
+import '../../Stock/StockToolsGui.js';

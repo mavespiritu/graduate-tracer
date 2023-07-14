@@ -11,23 +11,7 @@ use frontend\assets\AppAsset;
 use common\widgets\Alert;
 
 $asset = AppAsset::register($this);
-?>
-
-<?php if (Yii::$app->controller->action->id === 'login' || Yii::$app->controller->action->id === 'register' || Yii::$app->controller->action->id === 'request') { 
-
-    echo $this->render(
-        'main-sign',
-        ['content' => $content]
-    );
-} else if (Yii::$app->controller->action->id === 'index' && Yii::$app->controller->id === 'site' && (Yii::$app->user->isGuest)) { 
-    echo $this->render(
-        'main-login',
-        ['content' => $content]
-    );
-}else{
-    
-    frontend\assets\AppAsset::register($this);
-
+frontend\assets\AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -39,12 +23,18 @@ $asset = AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
     <?php $this->head() ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap bg">
+<div class="wrap" style="height: 100vh;">
+    <?php if ((Yii::$app->controller->action->id != 'login') && (Yii::$app->controller->action->id != 'register')) { ?>
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
@@ -53,15 +43,22 @@ $asset = AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+
     $menuItems = [
     ];
     if (Yii::$app->user->isGuest) {
-
+        $menuItems[] = ['label' => 'Login', 'url' => ['/user/login']];
+        $menuItems[] = ['label' => 'Sign Up', 'url' => ['/user/register']];
     } else {
-        $menuItems[] = ['label' => 'Main Menu', 'url' => ['/site/']];
+        $menuItems[] = ['label' => 'Game', 'url' => ['/site/']];
 
         if(Yii::$app->user->can('Administrator')){
+            $menuItems[] = ['label' => 'Dashboard', 'url' => ['/dashboard/']];
+            $menuItems[] = ['label' => 'Alumni List', 'url' => ['/alumnus']];
+            $menuItems[] = ['label' => 'Prizes', 'url' => ['/voucher-code']];
             $menuItems[] = ['label' => 'User Management', 'url' => ['/user/admin']];
+        }else if(Yii::$app->user->can('Faculty')){
+            $menuItems[] = ['label' => 'Dashboard', 'url' => ['/dashboard/']];
         }
 
         $menuItems[] = '<li>'
@@ -79,7 +76,11 @@ $asset = AppAsset::register($this);
     ]);
     NavBar::end();
     ?>
-    <div class="container animated bounceInDown">
+    <?php } ?>
+    <div class="<?= Yii::$app->user->isGuest ? '' : 'container animated bounceInDown' ?>">
+        <br>
+        <br>
+        <br>
         <?= $content ?>
     </div>
 </div>
@@ -88,4 +89,3 @@ $asset = AppAsset::register($this);
 </body>
 </html>
 <?php $this->endPage() ?>
-<?php } ?>

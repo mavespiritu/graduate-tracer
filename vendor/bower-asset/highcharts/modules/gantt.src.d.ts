@@ -13,22 +13,41 @@ import * as _Highcharts from "../highcharts.src";
  */
 export function factory(highcharts: typeof Highcharts): void;
 declare module "../highcharts.src" {
+    interface Point {
+        /**
+         * The ending X value of the range point.
+         */
+        x2?: number;
+    }
+    interface PointOptionsObject {
+        /**
+         * The ending X value of the range point.
+         */
+        x2?: number;
+    }
     /**
-     * Factory function for Gantt charts.
-     *
-     * @param options
-     *        The chart options structure.
-     *
-     * @param callback
-     *        Function to run when the chart has loaded and and all external
-     *        images are loaded. Defining a chart.events.load handler is
-     *        equivalent.
-     *
-     * @return Returns the Chart object.
+     * Gantt-optimized chart. Use Chart for common charts.
      */
-    function ganttChart(options: Options, callback?: ChartCallbackFunction): Chart;
+    class GanttChart extends Chart {
+        /**
+         * Initializes the chart. The constructor's arguments are passed on
+         * directly.
+         *
+         * @param userOptions
+         *        Custom options.
+         *
+         * @param callback
+         *        Function to run when the chart has loaded and and all external
+         *        images are loaded.
+         *
+         * @fires Highcharts.GanttChart#init
+         * @fires Highcharts.GanttChart#afterInit
+         */
+        init(userOptions: Options, callback?: Function): void;
+    }
     /**
-     * Factory function for Gantt charts.
+     * The factory function for creating new gantt charts. Creates a new
+     * GanttChart object with different default options than the basic Chart.
      *
      * @param renderTo
      *        The DOM element to render to, or its id.
@@ -43,7 +62,7 @@ declare module "../highcharts.src" {
      *
      * @return Returns the Chart object.
      */
-    function ganttChart(renderTo: (string|HTMLDOMElement), options: Options, callback?: ChartCallbackFunction): Chart;
+    function ganttChart(renderTo: (string|HTMLDOMElement), options: Options, callback?: ChartCallbackFunction): GanttChart;
     /**
      * When we have vertical scrollbar, rifles and arrow in buttons should be
      * rotated. The same method is used in Navigator's handles, to rotate them.
@@ -53,22 +72,10 @@ declare module "../highcharts.src" {
      *
      * @param vertical
      *        If vertical scrollbar, swap x-y values.
+     *
+     * @return Rotated path.
      */
-    function swapXY(path: Array<(number|string)>, vertical: boolean): Array<(number|string)>;
-    /**
-     * Returns the first break found where the x is larger then break.from and
-     * smaller then break.to.
-     *
-     * @param x
-     *        The number which should be within a break.
-     *
-     * @param breaks
-     *        The array of breaks to search within.
-     *
-     * @return Returns the first break found that matches, returns false if no
-     *         break is found.
-     */
-    function findBreakAt(x: number, breaks: any[]): (boolean|object);
+    function swapXY(path: SVGPathArray, vertical?: boolean): SVGPathArray;
 }
 export default factory;
 export let Highcharts: typeof _Highcharts;

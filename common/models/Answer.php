@@ -31,7 +31,7 @@ class Answer extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'question_id', 'next_question_id'], 'integer'],
-            [['answer'], 'string'],
+            [['answer'], 'safe'],
             [['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
             [['next_question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['next_question_id' => 'id']],
         ];
@@ -63,6 +63,6 @@ class Answer extends \yii\db\ActiveRecord
      */
     public function getNextQuestion()
     {
-        return $this->hasOne(Question::className(), ['id' => 'next_question_id']);
+        return !is_null($this->next_question_id) ? $this->hasOne(Question::className(), ['id' => 'next_question_id']) : null;
     }
 }

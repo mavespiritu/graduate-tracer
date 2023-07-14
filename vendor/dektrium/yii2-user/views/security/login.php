@@ -13,7 +13,7 @@ use dektrium\user\widgets\Connect;
 use dektrium\user\models\LoginForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+use frontend\assets\AppAsset;
 /**
  * @var yii\web\View $this
  * @var dektrium\user\models\LoginForm $model
@@ -22,82 +22,85 @@ use yii\widgets\ActiveForm;
 
 $this->title = Yii::t('user', 'Sign in');
 $this->params['breadcrumbs'][] = $this->title;
+
+$asset = AppAsset::register($this);
 ?>
 
 <?= $this->render('/_alert', ['module' => Yii::$app->getModule('user')]) ?>
 
 <div class="row">
-    <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
-            </div>
-            <div class="panel-body">
+    <div class="col-md-9 col-xs-12">
+        <div class="fill"></div>
+    </div>
+    <div class="col-md-3 col-xs-12">
+        <div class="row">
+            <div class="col-md-2 col-xs-12"></div>
+            <div class="col-md-8 col-xs-12" style="padding: 10px auto;">
+                <br>
+                <br>
+                <br>
+                <br>
+                <h3>Sign in your NLPSC Alumni account</h3>
                 <?php $form = ActiveForm::begin([
-                    'id' => 'login-form',
-                    'enableAjaxValidation' => true,
+                    'id'                     => 'login-form',
+                    'enableAjaxValidation'   => true,
                     'enableClientValidation' => false,
-                    'validateOnBlur' => false,
-                    'validateOnType' => false,
-                    'validateOnChange' => false,
+                    'validateOnBlur'         => false,
+                    'validateOnType'         => false,
+                    'validateOnChange'       => false,
                 ]) ?>
 
-                <?php if ($module->debug): ?>
-                    <?= $form->field($model, 'login', [
-                        'inputOptions' => [
-                            'autofocus' => 'autofocus',
-                            'class' => 'form-control',
-                            'tabindex' => '1']])->dropDownList(LoginForm::loginList());
-                    ?>
+                <?= $form->field($model, 'login', ['inputOptions' => ['autofocus' => 'autofocus', 'class' => 'form-control', 'tabindex' => '1', 'autocomplete'=>'off']])->label('Username') ?>
 
-                <?php else: ?>
+                <?= $form->field($model, 'password', ['inputOptions' => ['class' => 'form-control', 'tabindex' => '2']])->passwordInput()->label(Yii::t('user', 'Password')) ?>
+                <br>
 
-                    <?= $form->field($model, 'login',
-                        ['inputOptions' => ['autofocus' => 'autofocus', 'class' => 'form-control', 'tabindex' => '1']]
-                    );
-                    ?>
-
-                <?php endif ?>
-
-                <?php if ($module->debug): ?>
-                    <div class="alert alert-warning">
-                        <?= Yii::t('user', 'Password is not necessary because the module is in DEBUG mode.'); ?>
-                    </div>
-                <?php else: ?>
-                    <?= $form->field(
-                        $model,
-                        'password',
-                        ['inputOptions' => ['class' => 'form-control', 'tabindex' => '2']])
-                        ->passwordInput()
-                        ->label(
-                            Yii::t('user', 'Password')
-                            . ($module->enablePasswordRecovery ?
-                                ' (' . Html::a(
-                                    Yii::t('user', 'Forgot password?'),
-                                    ['/user/recovery/request'],
-                                    ['tabindex' => '5']
-                                )
-                                . ')' : '')
-                        ) ?>
-                <?php endif ?>
-
-                <?= $form->field($model, 'rememberMe')->checkbox(['tabindex' => '3']) ?>
-
-                <?= Html::submitButton(
-                    Yii::t('user', 'Sign in'),
-                    ['class' => 'btn btn-primary btn-block', 'tabindex' => '4']
-                ) ?>
+                <?= Html::submitButton(Yii::t('user', 'Sign in'), ['class' => 'btn btn-primary btn-block', 'tabindex' => '3']) ?>
 
                 <?php ActiveForm::end(); ?>
+                <br>
+                <?php if ($module->enableRegistration): ?>
+                    <p class="text-center">
+                        <?= Html::a(Yii::t('user', 'Don\'t have an account? Sign up!'), ['/user/registration/register']) ?>
+                    </p>
+                <?php endif ?>
+                <?= Connect::widget([
+                    'baseAuthUrl' => ['/user/security/auth'],
+                ]) ?>
+                </p>
             </div>
+            <div class="col-md-2 col-xs-12"></div>
         </div>
-        <?php if ($module->enableRegistration): ?>
-            <p class="text-center">
-                <?= Html::a(Yii::t('user', 'Don\'t have an account? Sign up!'), ['/user/registration/register'],['style' => 'color: #FFFFFF']) ?>
-            </p>
-        <?php endif ?>
-        <?= Connect::widget([
-            'baseAuthUrl' => ['/user/security/auth'],
-        ]) ?>
     </div>
 </div>
+<style>
+.centered {
+    text-align: center;
+    font-size: 0;
+}
+.centered > div {
+   float: none;
+   display: inline-block;
+   text-align: left;
+   font-size: 14px;
+}
+
+.fill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    background: url(<?= $asset->baseUrl.'/images/banner.png' ?>) no-repeat;
+    background-size: cover;
+}
+
+
+.content{
+    margin: 0 !important;
+    padding: 0 !important;
+}
+</style>

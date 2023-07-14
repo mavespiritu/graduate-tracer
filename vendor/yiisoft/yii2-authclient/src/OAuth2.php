@@ -1,14 +1,15 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 namespace yii\authclient;
 
 use Yii;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\HttpException;
 
 /**
@@ -61,6 +62,14 @@ abstract class OAuth2 extends BaseOAuth
      * @since 2.1
      */
     public $validateAuthState = true;
+    /**
+     * @var bool Whether to enable proof key for code exchange (PKCE) support and add
+     * a `code_challenge` and `code_verifier` to the auth request.
+     * @since 2.2.10
+     *
+     * @see https://oauth.net/2/pkce/
+     */
+    public $enablePkce = false;
 
 
     /**
@@ -84,6 +93,13 @@ abstract class OAuth2 extends BaseOAuth
             $authState = $this->generateAuthState();
             $this->setState('authState', $authState);
             $defaultParams['state'] = $authState;
+        }
+
+        if ($this->enablePkce) {
+            $codeVerifier = bin2hex(Yii::$app->security->generateRandomKey(64));
+            $this->setState('authCodeVerifier', $codeVerifier);
+            $defaultParams['code_challenge'] = trim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
+            $defaultParams['code_challenge_method'] = 'S256';
         }
 
         return $this->composeUrl($this->authUrl, array_merge($defaultParams, $params));
@@ -114,10 +130,19 @@ abstract class OAuth2 extends BaseOAuth
             'redirect_uri' => $this->getReturnUrl(),
         ];
 
+        if ($this->enablePkce) {
+            $defaultParams['code_verifier'] = $this->getState('authCodeVerifier');
+        }
+
         $request = $this->createRequest()
             ->setMethod('POST')
             ->setUrl($this->tokenUrl)
             ->setData(array_merge($defaultParams, $params));
+
+         // Azure AD will complain if there is no `Origin` header.
+        if ($this->enablePkce) {
+            $request->addHeaders(['Origin' => Url::to('/')]);
+        }
 
         $this->applyClientCredentialsToRequest($request);
 
@@ -201,7 +226,8 @@ abstract class OAuth2 extends BaseOAuth
      */
     protected function createToken(array $tokenConfig = [])
     {
-        $tokenConfig['tokenParamKey'] = 'access_token';
+        $defaultTokenConfig = ['tokenParamKey' => 'access_token'];
+        $tokenConfig = array_merge($defaultTokenConfig, $tokenConfig);
 
         return parent::createToken($tokenConfig);
     }

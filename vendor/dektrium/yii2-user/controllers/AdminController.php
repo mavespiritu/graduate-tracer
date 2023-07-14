@@ -192,7 +192,7 @@ class AdminController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['admin', 'Administrator'],
                     ],
                 ],
             ],
@@ -247,7 +247,7 @@ class AdminController extends Controller
         $this->trigger(self::EVENT_BEFORE_CREATE, $event);
         $userinfo = new UserInfo();
         $userinfo->load(Yii::$app->request->post());
-        $user->_userinfo = $userinfo;
+        $user->userinfo = $userinfo;
 
         if ($user->load(\Yii::$app->request->post()) && $user->create()) {
             \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'User has been created'));
@@ -258,8 +258,7 @@ class AdminController extends Controller
         $courses = Course::find()->orderBy(['name' => SORT_ASC])->all();
         $courses = ArrayHelper::map($courses, 'id', 'name');
 
-        $majors = Major::find()->orderBy(['name' => SORT_ASC])->all();
-        $majors = ArrayHelper::map($majors, 'id', 'name');
+        $majors = [];
 
         return $this->render('create', [
             'user' => $user,
@@ -286,7 +285,7 @@ class AdminController extends Controller
         $this->performAjaxValidation($user);
 
         $this->trigger(self::EVENT_BEFORE_UPDATE, $event);
-        if ($user->load(\Yii::$app->request->post()) && $user->save() && && $user->userinfo->load(Yii::$app->request->post()) && $user->userinfo->save()) {
+        if ($user->load(\Yii::$app->request->post()) && $user->save() && $user->userinfo->load(Yii::$app->request->post()) && $user->userinfo->save()) {
             \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'Account details have been updated'));
             $this->trigger(self::EVENT_AFTER_UPDATE, $event);
             return $this->refresh();
@@ -295,7 +294,7 @@ class AdminController extends Controller
         $courses = Course::find()->orderBy(['name' => SORT_ASC])->all();
         $courses = ArrayHelper::map($courses, 'id', 'name');
 
-        $majors = Major::find()->orderBy(['name' => SORT_ASC])->all();
+        $majors = Major::find()->where(['course_id' => $user->userinfo->course_id])->orderBy(['name' => SORT_ASC])->all();
         $majors = ArrayHelper::map($majors, 'id', 'name');
 
         return $this->render('_account', [

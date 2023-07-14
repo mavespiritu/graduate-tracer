@@ -14,10 +14,13 @@ return [
         'user' => [
             'class' => 'dektrium\user\Module',
             'admins' => ['markespiritu'],
+            'enableRegistration' => true,
+            'enableConfirmation' => true,
+            'enableUnconfirmedLogin' => false,
+            'enablePasswordRecovery' => false,
             'controllerMap' => [
                 'admin' => [
                     'class' => 'dektrium\user\controllers\AdminController',
-                    'enablePasswordRecovery' => false,
                     'as access' => [
                         'class' => 'yii\filters\AccessControl',
                         'rules' => [

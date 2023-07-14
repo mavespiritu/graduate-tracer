@@ -13,16 +13,22 @@ import * as _Highcharts from "../highcharts.src";
  */
 export function factory(highcharts: typeof Highcharts): void;
 declare module "../highcharts.src" {
-    interface AjaxSettings {
-        data: object;
-        dataType: ("json"|"octet"|"text"|"xml");
-        error: Function;
-        headers: object;
-        success: Function;
-        type: ("delete"|"get"|"post"|"update");
-        url: string;
-    }
     interface Chart {
+        /**
+         * Generates a data URL of CSV for local download in the browser. This
+         * is the default action for a click on the 'Download CSV' button.
+         *
+         * See Highcharts.Chart#getCSV to get the CSV data itself.
+         */
+        downloadCSV(): void;
+        /**
+         * Generates a data URL of an XLS document for local download in the
+         * browser. This is the default action for a click on the 'Download XLS'
+         * button.
+         *
+         * See Highcharts.Chart#getTable to get the table data itself.
+         */
+        downloadXLS(): void;
         /**
          * Export-data module required. Returns the current chart data as a CSV
          * string.
@@ -34,7 +40,7 @@ declare module "../highcharts.src" {
          *
          * @return CSV representation of the data
          */
-        getCSV(useLocalDecimalPoint: boolean): string;
+        getCSV(useLocalDecimalPoint?: boolean): string;
         /**
          * Export-data module required. Returns a two-dimensional array
          * containing the current chart data.
@@ -45,8 +51,10 @@ declare module "../highcharts.src" {
          *        is defined, this can override the behavior.
          *
          * @return The current chart data
+         *
+         * @fires Highcharts.Chart#exportData
          */
-        getDataRows(multiLevelHeaders: boolean): Array<Array<(number|string)>>;
+        getDataRows(multiLevelHeaders?: boolean): Array<Array<(number|string)>>;
         /**
          * Export-data module required. Build a HTML table with the chart's
          * current data.
@@ -57,31 +65,22 @@ declare module "../highcharts.src" {
          *        same locale as the user is.
          *
          * @return HTML representation of the data.
+         *
+         * @fires Highcharts.Chart#afterGetTable
          */
-        getTable(useLocalDecimalPoint: boolean): string;
+        getTable(useLocalDecimalPoint?: boolean): string;
         /**
-         * Experimental function to send a chart's config to the Cloud for
-         * editing.
-         *
-         * Limitations
-         *
-         * - All functions (formatters and callbacks) are removed since they're
-         * not JSON.
+         * Export-data module required. Hide the data table when visible.
          */
-        openInCloud(): void;
+        hideData(): void;
         /**
          * Export-data module required. View the data in a table below the
          * chart.
+         *
+         * @fires Highcharts.Chart#afterViewData
          */
         viewData(): void;
     }
-    /**
-     * Perform an Ajax call.
-     *
-     * @param attr
-     *        The Ajax settings to use.
-     */
-    function ajax(attr: AjaxSettings): void;
 }
 export default factory;
 export let Highcharts: typeof _Highcharts;
