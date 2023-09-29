@@ -16,7 +16,7 @@ use yii\bootstrap\Modal;
 <div class="ui segment" style="border-radius: 15px;">
     <h2>Congratulations! 
         <span class="pull-right">
-            <?= !is_null($nextStage) ? '<button class="ui teal button" onclick="playGame('.$nextStage->id.')" >Proceed to Next Part</button>' : '<button class="ui teal button" onclick="claim()" >Claim your prize</button>' ?>
+            <?= !is_null($nextStage) ? '<button class="ui teal button" onclick="playForm('.$nextStage->id.')" >Proceed to Next Part</button>' : '<button class="ui teal button" onclick="claim()" >Claim your prize</button>' ?>
             <button class="ui red button" onclick="exitGame()">Exit Game</button>
         </span>
     </h2>
@@ -29,7 +29,7 @@ use yii\bootstrap\Modal;
             'stage' => $stage,
         ]);
     ?>
-    <?= !is_null($nextStage) ? '<button class="ui teal button" onclick="playGame('.$nextStage->id.')" >Proceed to Next Part</button>' : '<button class="ui teal button" onclick="claim()" >Claim your prize</button>' ?>
+    <?= !is_null($nextStage) ? '<button class="ui teal button" onclick="playForm('.$nextStage->id.')" >Proceed to Next Part</button>' : '<button class="ui teal button" onclick="claim()" >Claim your prize</button>' ?>
     <button class="ui red button" onclick="exitGame()">Exit Game</button>
 </div>
 <?php

@@ -29,6 +29,7 @@ class Stage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['next_stage'], 'int'],
             [['title'], 'string'],
             [['table'], 'string', 'max' => 200],
         ];
@@ -51,5 +52,10 @@ class Stage extends \yii\db\ActiveRecord
         $completion = Completion::findOne(['user_id' => Yii::$app->user->id, 'stage_id' => $this->id]) ? 'Completed' : 'Not Completed';
 
         return $completion;
+    }
+
+    public function getNextStage()
+    {
+        return $this->hasOne(Stage::className(), ['id' => 'next_stage']);
     }
 }

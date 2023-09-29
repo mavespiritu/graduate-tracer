@@ -30,6 +30,7 @@ class Answer extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['answer'], 'required', 'on' => 'requiredAnswer'],
             [['user_id', 'question_id', 'next_question_id'], 'integer'],
             [['answer'], 'safe'],
             [['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],

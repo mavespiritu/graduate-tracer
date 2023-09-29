@@ -155,7 +155,7 @@ a.desc:after {
 }
 
 .navbar-nav > li > a:focus,
-.navbar-nav > li > a:hover,{
+.navbar-nav > li > a:hover{
     text-decoration: none;
     color: black !important;
     font-weight: bolder;

@@ -153,7 +153,7 @@ $this->registerJs($script);
 ?>
 <style>
     input[type=text]{
-        border-radius: 15px !important;
+        border-radius: 5px !important;
     }
     .stage{
         height: 100px;

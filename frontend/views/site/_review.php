@@ -2,6 +2,8 @@
 use yii\helpers\Html;
 use yii\web\View;
 use yii\helpers\Url;
+use common\models\Region;
+use common\models\Province;
 ?>
 
 <p>Below are your answers on the questions provided by the graduate tracer.</p>
@@ -26,7 +28,15 @@ use yii\helpers\Url;
                     <?php } ?>
                 </span>
             <?php }else{ ?>
-                <span style="font-size: 18px;"><?= $answer->answer ?></span>
+                <?php if($answer->question_id == 12){ ?>
+                    <?php $region = Region::findOne($answer->answer); ?>
+                    <span style="font-size: 18px;"><?= $region->abbreviation ?></span>
+                <?php }else if($answer->question_id == 13){ ?>
+                    <?php $province = Province::findOne($answer->answer); ?>
+                    <span style="font-size: 18px;"><?= $province->province_m ?></span>
+                <?php }else{ ?>
+                    <span style="font-size: 18px;"><?= $answer->answer ?></span>
+                <?php } ?>
             <?php } ?>
             </p>
         </div>
